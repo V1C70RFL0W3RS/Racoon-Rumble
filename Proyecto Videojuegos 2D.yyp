@@ -1,0 +1,45 @@
+{
+  "$GMProject":"v1",
+  "%Name":"Proyecto Videojuegos 2D",
+  "AudioGroups":[
+    {"$GMAudioGroup":"v1","%Name":"audiogroup_default","exportDir":"","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
+  ],
+  "configs":{
+    "children":[],
+    "name":"Default",
+  },
+  "defaultScriptType":0,
+  "Folders":[
+    {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Guns","folderPath":"folders/Sprites/Guns.yy","name":"Guns","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Racoon","folderPath":"folders/Sprites/Racoon.yy","name":"Racoon","resourceType":"GMFolder","resourceVersion":"2.0",},
+  ],
+  "ForcedPrefabProjectReferences":[],
+  "IncludedFiles":[],
+  "isEcma":false,
+  "LibraryEmitters":[],
+  "MetaData":{
+    "IDEVersion":"2024.14.1.210",
+  },
+  "name":"Proyecto Videojuegos 2D",
+  "resources":[
+    {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"id":{"name":"Spr_Gun_1","path":"sprites/Spr_Gun_1/Spr_Gun_1.yy",},},
+    {"id":{"name":"Spr_Gun_2","path":"sprites/Spr_Gun_2/Spr_Gun_2.yy",},},
+    {"id":{"name":"Spr_Racoon_Idle_Gun","path":"sprites/Spr_Racoon_Idle_Gun/Spr_Racoon_Idle_Gun.yy",},},
+    {"id":{"name":"Spr_Racoon_Idle","path":"sprites/Spr_Racoon_Idle/Spr_Racoon_Idle.yy",},},
+    {"id":{"name":"Spr_Racoon_Jump","path":"sprites/Spr_Racoon_Jump/Spr_Racoon_Jump.yy",},},
+    {"id":{"name":"Spr_Racoon_Walk_Gun_2","path":"sprites/Spr_Racoon_Walk_Gun_2/Spr_Racoon_Walk_Gun_2.yy",},},
+    {"id":{"name":"Spr_Racoon_Walk_Gun","path":"sprites/Spr_Racoon_Walk_Gun/Spr_Racoon_Walk_Gun.yy",},},
+    {"id":{"name":"Spr_Racoon_Walk","path":"sprites/Spr_Racoon_Walk/Spr_Racoon_Walk.yy",},},
+  ],
+  "resourceType":"GMProject",
+  "resourceVersion":"2.0",
+  "RoomOrderNodes":[
+    {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+  ],
+  "templateType":"game",
+  "TextureGroups":[
+    {"$GMTextureGroup":"","%Name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","customOptions":"","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"name":"Default","resourceType":"GMTextureGroup","resourceVersion":"2.0","targets":-1,},
+  ],
+}
