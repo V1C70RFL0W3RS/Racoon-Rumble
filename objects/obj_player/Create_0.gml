@@ -1,0 +1,8 @@
+player_index = 0;
+hsp = 0;
+vsp = 0;
+is_grounded = false;
+facing = 1;
+state = PLAYER_STATE.IDLE;
+held_weapon = noone;
+tilemap = layer_tilemap_get_id("layer_collision");

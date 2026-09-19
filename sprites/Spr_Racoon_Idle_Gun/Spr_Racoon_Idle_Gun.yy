@@ -31,7 +31,7 @@
   "origin":9,
   "parent":{
     "name":"Racoon",
-    "path":"folders/Sprites/Racoon.yy",
+    "path":"folders/Sprites/Players/Racoon.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
