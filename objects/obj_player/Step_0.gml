@@ -1,6 +1,9 @@
 // --- obj_player → Step Event (versión completa actualizada) ---
-var _in = get_player_input(player_index);
 
+var _in = get_player_input(player_index);
+player_update_weapon(_in);   // NUEVO
+aim_up = _in.up_held;
+player_try_fire(_in);
 hsp = (_in.move_x != 0) ? approach(hsp, PLAYER_MOVE_SPEED * _in.move_x, PLAYER_ACCEL)
                           : approach(hsp, 0, PLAYER_ACCEL * 2);
 if (_in.move_x != 0) facing = sign(_in.move_x);

@@ -6,3 +6,5 @@ facing = 1;
 state = PLAYER_STATE.IDLE;
 held_weapon = noone;
 tilemap = layer_tilemap_get_id("layer_collision");
+aim_up = false;
+hp = PLAYER_MAX_HP;
