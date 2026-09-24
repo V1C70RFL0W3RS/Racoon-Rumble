@@ -1,7 +1,14 @@
 // --- obj_player → Step Event (versión completa actualizada) ---
 
+if (state == PLAYER_STATE.DEAD) exit;
+
+// Congelado mientras corre la cuenta regresiva. El chequeo de
+// variable_struct_exists es necesario porque en rm_lobby global.match.state
+// todavía no existe (match_start() no se llamó) y no queremos romper ahí.
+if (variable_struct_exists(global.match, "state") && global.match.state == MATCH_STATE.COUNTDOWN) exit;
+
 var _in = get_player_input(player_index);
-player_update_weapon(_in);   // NUEVO
+player_update_weapon(_in);
 aim_up = _in.up_held;
 player_try_fire(_in);
 hsp = (_in.move_x != 0) ? approach(hsp, PLAYER_MOVE_SPEED * _in.move_x, PLAYER_ACCEL)

@@ -23,6 +23,16 @@
 #macro WEAPON_MAX_PUSHOUT  96   // máximo de px que se busca un lugar libre si nace solapada
 #macro PLAYER_MAX_HP           1     // 1 = un golpe mata (pilar de diseño)
 #macro MATCH_ROUND_END_FRAMES  150   // pausa tras terminar la ronda (2.5 s a 60 FPS)
+#macro LOBBY_JOIN_KEY vk_space
+#macro MATCH_COUNTDOWN_SECONDS 5
+#macro MATCH_INTERMISSION_FRAMES 300 // 5 s a 60 FPS, mostrando puntajes
+
+// TEMPORAL: valores por defecto hasta que exista la UI de ajustes del lobby (Paso 4).
+#macro MATCH_DEFAULT_SCORE_TO_WIN     3
+#macro MATCH_DEFAULT_ROUNDS_PER_BLOCK 3
+
+// TEMPORAL: segundo teclado de testeo, para probar multijugador sin mando físico.
+#macro LOBBY_JOIN_KEY_TEST vk_shift
 
 // --- Jugadores ---
 #macro MAX_PLAYERS 4

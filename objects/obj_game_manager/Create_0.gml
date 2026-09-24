@@ -1,4 +1,4 @@
-// --- Create Event ---
 weapon_data_init();
-
-match_start();   // arma el estado de la partida y va al primer mapa
+global.match = {}; // se va completando a medida que avanza cada fase del flujo
+lobby_reset();
+room_goto(rm_menu);
