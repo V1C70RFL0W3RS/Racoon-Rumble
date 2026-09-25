@@ -74,7 +74,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2026.0.0.16",
+    "IDEVersion":"2024.14.4.222",
   },
   "name":"Proyecto Videojuegos 2D",
   "resources":[
@@ -224,6 +224,7 @@
     {"id":{"name":"spr_tileset_8","path":"sprites/spr_tileset_8/spr_tileset_8.yy",},},
     {"id":{"name":"spr_tileset_9","path":"sprites/spr_tileset_9/spr_tileset_9.yy",},},
     {"id":{"name":"spr_tileset_ground","path":"sprites/spr_tileset_ground/spr_tileset_ground.yy",},},
+    {"id":{"name":"spr_trashcan","path":"sprites/spr_trashcan/spr_trashcan.yy",},},
     {"id":{"name":"spr_weapon_gun_1","path":"sprites/spr_weapon_gun_1/spr_weapon_gun_1.yy",},},
     {"id":{"name":"spr_weapon_gun_2","path":"sprites/spr_weapon_gun_2/spr_weapon_gun_2.yy",},},
     {"id":{"name":"Sprite20","path":"sprites/Sprite20/Sprite20.yy",},},
