@@ -101,3 +101,27 @@ function weapon_data_init() {
 function weapon_get_def(_id) {
     return global.weapon_defs[_id];
 }
+
+/// Devuelve un WEAPON_ID válido al azar (de 0 hasta COUNT-1).
+function weapon_pick_random_id() {
+    return irandom(WEAPON_ID.COUNT - 1);
+}
+
+/// Texto de la opción "arma al azar" en la lista weapon_choice de obj_weapon_spawner.
+#macro WEAPON_CHOICE_RANDOM "Aleatoria"
+
+/// Convierte la opción elegida en el editor (texto) en un WEAPON_ID válido.
+/// Los nombres de la lista deben coincidir con WeaponDef.name; el orden no importa.
+function weapon_id_from_choice(_choice) {
+    if (_choice == WEAPON_CHOICE_RANDOM) return weapon_pick_random_id();
+
+    var _defs = global.weapon_defs;
+    for (var i = 0; i < array_length(_defs); i++) {
+        if (_defs[i].name == _choice) return i;
+    }
+
+    // Nombre que no existe en el catálogo: se avisa y se elige una al azar
+    // para que el juego no se caiga.
+    show_debug_message("weapon_id_from_choice: arma desconocida '" + string(_choice) + "', se usa una aleatoria.");
+    return weapon_pick_random_id();
+}

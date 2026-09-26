@@ -117,26 +117,31 @@ function match_update() {
 /// @desc TEMPORAL: mensajes de texto simples. Se reemplaza cuando exista la UI real.
 function match_draw_debug() {
     var _m = global.match;
-    var _cx = display_get_gui_width() * 0.5;
 
-    draw_set_halign(fa_center);
     if (_m.state == MATCH_STATE.COUNTDOWN) {
-        draw_text(_cx, 40, string(ceil(_m.timer / room_speed)));
+        ui_draw_title(string(ceil(_m.timer / room_speed)));
+
     } else if (_m.state == MATCH_STATE.ROUND_OVER) {
-        draw_text(_cx, 40, (_m.winner >= 0) ? "Gana J" + string(_m.winner + 1) : "Empate");
+        ui_draw_title((_m.winner >= 0) ? "Gana J" + string(_m.winner + 1) : "Empate");
+
     } else if (_m.state == MATCH_STATE.INTERMISSION) {
-        draw_text(_cx, 40, "PUNTAJES");
-        for (var _i = 0; _i < array_length(_m.scores); _i++) {
-            draw_text(_cx, 70 + _i * 24, "J" + string(_i + 1) + ": " + string(_m.scores[_i]));
+        ui_draw_title("PUNTAJES", 0.15);
+        var _lines = array_create(array_length(_m.scores));
+        for (var i = 0; i < array_length(_lines); i++) {
+            _lines[i] = "J" + string(i + 1) + ": " + string(_m.scores[i]);
         }
+        ui_draw_body_list(_lines, 0.3);
+
     } else if (_m.state == MATCH_STATE.MATCH_OVER) {
-        draw_text(_cx, 40, "GANADOR: J" + string(_m.winner + 1));
-        for (var _i = 0; _i < array_length(_m.scores); _i++) {
-            draw_text(_cx, 80 + _i * 24, "J" + string(_i + 1) + ": " + string(_m.scores[_i]));
+        ui_draw_title("GANADOR: J" + string(_m.winner + 1), 0.15);
+        var _lines = array_create(array_length(_m.scores) + 1);
+        for (var i = 0; i < array_length(_m.scores); i++) {
+            _lines[i] = "J" + string(i + 1) + ": " + string(_m.scores[i]);
         }
-        draw_text(_cx, 80 + array_length(_m.scores) * 24 + 16, "Salto para reiniciar");
+        _lines[array_length(_m.scores)] = "";
+        ui_draw_body("Salto para reiniciar", 0.3 + (array_length(_m.scores) + 1) * 0.04);
+        ui_draw_body_list(_lines, 0.3);
     }
-    draw_set_halign(fa_left);
 }
 /// <summary>
 /// Crea global.match con la configuración de una partida nueva. Se llama al salir
@@ -200,4 +205,21 @@ function match_begin_round() {
     global.match.timer = MATCH_COUNTDOWN_SECONDS * room_speed;
     global.match.winner = -1;
     room_goto(match_bag_next_map());
+}
+
+/// @desc Devuelve todas las rooms que son mapas jugables (nombre con
+///       MAP_NAME_PREFIX). Agregar un mapa nuevo es solo nombrarlo así
+///       y ubicarlo en la carpeta Maps — no hace falta tocar código.
+function match_scan_maps() {
+    var _all  = asset_get_ids(asset_room);
+    var _maps = [];
+
+    for (var i = 0; i < array_length(_all); i++) {
+        var _name = room_get_name(_all[i]);
+        if (string_pos(MAP_NAME_PREFIX, _name) == 1) {
+            array_push(_maps, _all[i]);
+        }
+    }
+
+    return _maps;
 }

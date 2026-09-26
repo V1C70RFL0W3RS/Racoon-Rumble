@@ -1,3 +1,3 @@
-  draw_text(20, 20, "Presioná ESPACIO (teclado) o A (mando) para unirte");
-  draw_text(20, 40, "Unidos: " + string(array_length(global.match.players_joined)));
-  draw_text(20, 60, "ENTER para ir al lobby");
+ui_draw_body("Presioná ESPACIO (teclado) o A (mando) para unirte", 0.4);
+ui_draw_body("Unidos: " + string(array_length(global.match.players_joined)), 0.5);
+ui_draw_body("ENTER para ir al lobby", 0.6);

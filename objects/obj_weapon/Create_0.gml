@@ -1,3 +1,5 @@
+
+
 // Qué arma es. Si quien la crea no lo indicó, es una pistola.
 // (Ver nota más abajo sobre por qué usamos variable_instance_exists.)
 if (!variable_instance_exists(id, "weapon_id")) weapon_id = WEAPON_ID.PISTOL;

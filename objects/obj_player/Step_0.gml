@@ -22,6 +22,7 @@ if (_in.jump_pressed && is_grounded) {
     state = PLAYER_STATE.JUMP;
 }
 
+
 var col_h = move_and_collide(hsp, 0, tilemap);
 if (array_length(col_h) > 0) hsp = 0;
 
@@ -34,3 +35,9 @@ if (array_length(col_v) > 0) {
 }
 
 player_update_state(id, _in);
+
+// Caer fuera del mapa mata, igual que un disparo (evita que la cámara
+// se quede zoomeando al infinito detrás de alguien que ya no va a volver).
+if (y > room_height + ROOM_FALL_KILL_MARGIN) {
+    player_die();
+}

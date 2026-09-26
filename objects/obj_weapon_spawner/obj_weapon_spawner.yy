@@ -1,17 +1,16 @@
 {
   "$GMObject":"",
-  "%Name":"obj_weapon",
+  "%Name":"obj_weapon_spawner",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"obj_weapon",
+  "name":"obj_weapon_spawner",
   "overriddenProperties":[],
   "parent":{
-    "name":"Weapons",
-    "path":"folders/Objects/Weapons.yy",
+    "name":"Level",
+    "path":"folders/Objects/Level.yy",
   },
   "parentObjectId":null,
   "persistent":false,
@@ -27,11 +26,23 @@
   "physicsShape":1,
   "physicsShapePoints":[],
   "physicsStartAwake":true,
-  "properties":[],
+  "properties":[
+    {"$GMObjectProperty":"v2","%Name":"weapon_choice","filters":[],"listItems":[
+        "\"Aleatoria fija\"",
+        "\"Aleatoria\"",
+        "\"Pistola\"",
+        "\"Escopeta\"",
+        "\"Magnum\"",
+        "\"SMG\"",
+      ],"multiselect":false,"name":"weapon_choice","rangeEnabled":false,"rangeMax":10.0,"rangeMin":-1.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"Aleatoria fija\"","varType":6,},
+  ],
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"spr_obj_weapon",
+    "path":"sprites/spr_obj_weapon/spr_obj_weapon.yy",
+  },
   "spriteMaskId":{
     "name":"spr_obj_weapon",
     "path":"sprites/spr_obj_weapon/spr_obj_weapon.yy",

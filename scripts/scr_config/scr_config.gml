@@ -37,3 +37,21 @@
 // --- Jugadores ---
 #macro MAX_PLAYERS 4
 enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, SLIDE, HURT, DEAD }
+
+// Spawners de armas
+#macro WEAPON_SPAWNER_RESPAWN_FRAMES 300   // frames que espera un punto libre antes de generar otra arma (5 s a 60 fps)
+#macro WEAPON_SPAWNER_CHECK_RADIUS   20    // px: si el arma se aleja más que esto, el punto cuenta como libre
+/// Opción "arma al azar, decidida una sola vez por ronda" (weapon_choice del spawner).
+#macro WEAPON_CHOICE_RANDOM_LOCKED "Aleatoria fija"
+
+// Cámara dinámica
+#macro CAMERA_VIEW_W        640   // resolución nativa: nunca hace zoom-in más allá de esto
+#macro CAMERA_VIEW_H        360
+#macro CAMERA_MAX_ZOOM_OUT  2     // hasta el doble de alejada (1280x720) antes de topar
+#macro CAMERA_PADDING_X     64    // margen en px de mundo alrededor de los jugadores vivos
+#macro CAMERA_PADDING_Y     64
+#macro CAMERA_POS_LERP      0.1   // qué tan rápido sigue la posición (0-1, más alto = más rápido)
+#macro CAMERA_ZOOM_LERP     0.05  // el zoom se mueve más despacio que la posición, se siente menos brusco
+#macro ROOM_FALL_KILL_MARGIN 64
+
+#macro MAP_NAME_PREFIX "rm_map_"   // toda room que empiece así se considera un mapa jugable
