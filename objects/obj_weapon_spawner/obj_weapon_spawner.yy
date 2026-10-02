@@ -40,8 +40,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_obj_weapon",
-    "path":"sprites/spr_obj_weapon/spr_obj_weapon.yy",
+    "name":"spr_trashcan",
+    "path":"sprites/spr_trashcan/spr_trashcan.yy",
   },
   "spriteMaskId":{
     "name":"spr_obj_weapon",
