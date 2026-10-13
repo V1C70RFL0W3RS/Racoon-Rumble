@@ -8,3 +8,5 @@ held_weapon = noone;
 tilemap = layer_tilemap_get_id("layer_collision");
 aim_up = false;
 hp = PLAYER_MAX_HP;
+image_speed = 0;  // DECISIÓN: el frame lo elige player_update_animation(), no el motor
+anim_time   = 0;  // contador propio de la animación actual

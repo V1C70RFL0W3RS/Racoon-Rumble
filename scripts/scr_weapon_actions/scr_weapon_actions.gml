@@ -19,16 +19,13 @@ function weapon_find_grabbable(_x, _y) {
 
 /// @desc Dibuja un arma sostenida en la mano de quien la lleva.
 /// @param {Id.Instance} _weapon Instancia de obj_weapon.
-/// @param {Real} _x Posición X del jugador.
-/// @param {Real} _y Posición Y del jugador (sus pies).
+/// @param {Real} _x Posición X de la mano (agarre del arma).
+/// @param {Real} _y Posición Y de la mano.
 /// @param {Real} _facing 1 = mira a la derecha, -1 = a la izquierda.
-/// @param {Bool} _aim_up true = el arma apunta hacia arriba.
-function weapon_draw_held(_weapon, _x, _y, _facing, _aim_up) {
-    // 90 * facing: con el sprite espejado (mira a la izquierda) el giro va al revés.
-    var _angle = (_aim_up ? 90 * _facing : 0) + _weapon.kick * _facing;
-    draw_sprite_ext(_weapon.sprite_index, 0,
-        _x + HAND_OFFSET_X * _facing, _y + HAND_OFFSET_Y,
-        _facing, 1, _angle, c_white, 1);
+/// @param {Real} _angle Ángulo mundial de apuntado, ya con el kick incluido.
+function weapon_draw_held(_weapon, _x, _y, _facing, _angle) {
+    // Mismo convenio que el brazo (ver player_draw_arm): ángulo mundial + yscale = facing.
+    draw_sprite_ext(_weapon.sprite_index, 0, _x, _y, 1, _facing, _angle, c_white, 1);
 }
 
 /// @desc Intenta disparar un arma. Respeta cadencia y munición.

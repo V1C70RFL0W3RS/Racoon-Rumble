@@ -1,9 +1,20 @@
 // --- obj_player → Draw Event ---
-var _spr = player_get_sprite(state);
-if (sprite_index != _spr) { sprite_index = _spr; image_index = 0; }
+var _color = player_get_color_index(player_index);
+var _ang   = player_get_arm_angle(); // un solo ángulo para brazo y arma
 
+// 1. Cuerpo (con color)
+palette_apply(_color);
 draw_sprite_ext(sprite_index, image_index, x, y, facing, 1, 0, c_white, 1);
+palette_reset();
 
-// Arma dibujada aparte, en la mano — independiente de la pose del cuerpo
-// Arma dibujada aparte, en la mano — independiente de la pose del cuerpo
-if (held_weapon != noone) weapon_draw_held(held_weapon, x, y, facing, aim_up);
+// 2. Arma (sin color), en la mano
+if (held_weapon != noone) {
+    weapon_draw_held(held_weapon, player_hand_x(_ang), player_hand_y(_ang), facing, _ang);
+}
+
+// 3. Brazo (con color), encima del arma
+palette_apply(_color);
+player_draw_arm(_ang);
+palette_reset();
+
+player_debug_arm(_ang); // TEMPORAL

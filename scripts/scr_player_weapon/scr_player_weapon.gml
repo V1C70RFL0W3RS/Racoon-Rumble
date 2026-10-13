@@ -10,7 +10,8 @@ function player_update_weapon(_in) {
 
 /// @desc Toma el arma suelta más cercana, si hay alguna al alcance.
 function player_grab_weapon() {
-    var _w = weapon_find_grabbable(x, y + HAND_OFFSET_Y);
+    // Se busca a la altura del pecho (el hombro): HAND_OFFSET ya no se usa.
+    var _w = weapon_find_grabbable(x, y + PLAYER_SHOULDER_Y);
     if (_w == noone) return;
 
     _w.holder = id;
@@ -21,12 +22,15 @@ function player_grab_weapon() {
 ///       lanza hacia adelante; quieto, la lanza suavemente.
 /// @param {Struct} _in Input del frame actual.
 function player_release_weapon(_in) {
+    // DECISIÓN: el ángulo y la mano se leen ANTES de soltar. Sin arma,
+    // player_get_arm_angle() devuelve el brazo colgando (270) y el arma
+    // "saltaría" de lugar en el instante de soltarla.
+    var _ang = player_get_arm_angle();
+    var _hx  = player_hand_x(_ang);
+    var _hy  = player_hand_y(_ang);
+
     var _w = held_weapon;
     held_weapon = noone;
-
-    // El arma nace en la MANO (no en los pies) para que se vea el arco.
-    var _hx = x + HAND_OFFSET_X * facing;
-    var _hy = y + HAND_OFFSET_Y;
 
     if (_in.up_held) {
         weapon_eject(_w, _hx, _hy, facing, hsp, -WEAPON_THROW_UP_SPEED, -WEAPON_THROW_SPIN * facing);
@@ -47,14 +51,12 @@ function player_try_fire(_in) {
     var _wants_fire = held_weapon.def.automatic ? _in.fire_held : _in.fire_pressed;
     if (!_wants_fire) return;
 
-    // Dirección base (3 direcciones por ahora) y dirección real con el kick del arma.
-    var _base = _in.up_held ? 90 : (facing == 1 ? 0 : 180);
-    var _aim  = weapon_get_aim_angle(held_weapon, _base, facing);
+    // aim_up ya se actualizó en este Step (antes de llamar a esta función).
+    var _base = player_get_base_aim_angle();  // dirección base, sin kick
+    var _aim  = player_get_arm_angle();       // dirección real, con el kick del arma
 
-    var _hand_x = x + HAND_OFFSET_X * facing;
-    var _hand_y = y + HAND_OFFSET_Y;
-
-    if (weapon_try_fire(held_weapon, _hand_x, _hand_y, _aim, id)) {
+    // Las balas salen desde la mano, la misma donde se dibuja el arma.
+    if (weapon_try_fire(held_weapon, player_hand_x(_aim), player_hand_y(_aim), _aim, id)) {
         // El retroceso usa la dirección BASE, no la del kick, para que el
         // jugador no se sacuda de forma errática.
         var _recoil = held_weapon.def.recoil;

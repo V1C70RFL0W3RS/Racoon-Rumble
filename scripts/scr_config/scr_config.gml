@@ -12,8 +12,6 @@
 #macro WEAPON_THROW_MIN_SPEED  0.5  // si abs(hsp) supera esto, "se está moviendo" → lanza
 #macro WEAPON_THROW_SPEED      9    // impulso horizontal extra del lanzamiento
 #macro WEAPON_THROW_LIFT      -3    // impulso vertical del lanzamiento (arco hacia arriba)
-#macro HAND_OFFSET_X  8    // qué tan adelante del centro queda la mano
-#macro HAND_OFFSET_Y -18   // altura de la mano; negativo = por encima de los pies (origin Bottom Center)
 #macro WEAPON_THROW_UP_SPEED  9     // velocidad al lanzar hacia arriba
 #macro WEAPON_THROW_SPIN      14    // grados por frame que gira al lanzarla
 #macro WEAPON_DROP_SPIN       3     // giro suave al soltarla quieto
@@ -45,8 +43,8 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, SLIDE, HURT, DEAD }
 #macro WEAPON_CHOICE_RANDOM_LOCKED "Aleatoria fija"
 
 // Cámara dinámica
-#macro CAMERA_VIEW_W        640   // resolución nativa: nunca hace zoom-in más allá de esto
-#macro CAMERA_VIEW_H        360
+#macro CAMERA_VIEW_W 320   // antes 640
+#macro CAMERA_VIEW_H 180   // antes 360
 #macro CAMERA_MAX_ZOOM_OUT  2     // hasta el doble de alejada (1280x720) antes de topar
 #macro CAMERA_PADDING_X     64    // margen en px de mundo alrededor de los jugadores vivos
 #macro CAMERA_PADDING_Y     64
@@ -54,4 +52,12 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, SLIDE, HURT, DEAD }
 #macro CAMERA_ZOOM_LERP     0.05  // el zoom se mueve más despacio que la posición, se siente menos brusco
 #macro ROOM_FALL_KILL_MARGIN 64
 
-#macro MAP_NAME_PREFIX "rm_map_"   // toda room que empiece así se considera un mapa jugable
+#macro MAP_NAME_PREFIX "rm_map_"
+#macro PLAYER_RUN_ANIM_RATE     0.08  // frames de animación avanzados por cada píxel/step de velocidad
+#macro PLAYER_JUMP_START_FRAMES 4     // steps que se muestra la pose de despegue
+// Posición del hombro respecto al origin del jugador (pies, centro). Y negativa = hacia arriba.
+// Valores de partida: se afinan a ojo (ver 4e).
+#macro PLAYER_SHOULDER_X  -2
+#macro PLAYER_SHOULDER_Y  -12
+// Distancia del hombro a la mano (donde se agarra el arma), en píxeles. Se afina a ojo (ver 5e).
+#macro PLAYER_ARM_LENGTH  9

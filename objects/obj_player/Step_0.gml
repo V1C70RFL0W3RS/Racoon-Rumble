@@ -1,10 +1,7 @@
-// --- obj_player → Step Event (versión completa actualizada) ---
+// --- obj_player → Step Event ---
 
 if (state == PLAYER_STATE.DEAD) exit;
 
-// Congelado mientras corre la cuenta regresiva. El chequeo de
-// variable_struct_exists es necesario porque en rm_lobby global.match.state
-// todavía no existe (match_start() no se llamó) y no queremos romper ahí.
 if (variable_struct_exists(global.match, "state") && global.match.state == MATCH_STATE.COUNTDOWN) exit;
 
 var _in = get_player_input(player_index);
@@ -22,7 +19,6 @@ if (_in.jump_pressed && is_grounded) {
     state = PLAYER_STATE.JUMP;
 }
 
-
 var col_h = move_and_collide(hsp, 0, tilemap);
 if (array_length(col_h) > 0) hsp = 0;
 
@@ -35,9 +31,8 @@ if (array_length(col_v) > 0) {
 }
 
 player_update_state(id, _in);
+player_update_animation(); // <-- NUEVA: elige sprite y frame con el estado ya actualizado
 
-// Caer fuera del mapa mata, igual que un disparo (evita que la cámara
-// se quede zoomeando al infinito detrás de alguien que ya no va a volver).
 if (y > room_height + ROOM_FALL_KILL_MARGIN) {
     player_die();
 }

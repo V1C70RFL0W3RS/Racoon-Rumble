@@ -22,43 +22,44 @@ function lobby_device_joined(_device_type, _device_index) {
 }
 
 /// <summary>
+/// ÚNICO lugar donde se crea la entrada de un jugador unido. Le asigna el primer
+/// color libre de la paleta. Devuelve true si lo agregó, false si no hay lugar.
+/// </summary>
+function lobby_add_player(_device_type, _device_index) {
+    // Defensa extra: dos dispositivos pueden unirse en el mismo Step.
+    if (array_length(global.match.players_joined) >= MAX_PLAYERS) return false;
+
+    array_push(global.match.players_joined, {
+        device_type:  _device_type,
+        device_index: _device_index,
+        color_index:  palette_first_free_index(),
+        ready:        false
+    });
+    return true;
+}
+
+/// <summary>
 /// Escanea teclado y gamepads buscando el botón de unirse. Si un dispositivo nuevo lo
 /// presiona y hay lugar, lo agrega. Se llama una vez por Step desde el controlador
-/// del menú/lobby (todavía no existe ese objeto — lo armamos más abajo).
+/// del menú/lobby.
 /// </summary>
 function lobby_scan_join() {
     if (array_length(global.match.players_joined) >= MAX_PLAYERS) return;
 
-    // "Jugador teclado": uno solo posible, comparte botón con el salto (como DuckGame).
-	// Jugador teclado normal (WASD + espacio).
-	if (!lobby_device_joined("keyboard", 0) && keyboard_check_pressed(LOBBY_JOIN_KEY)) {
-	    array_push(global.match.players_joined, {
-	        device_type: "keyboard",
-	        device_index: 0,
-	        ready: false
-	    });
-	}
+    // Jugador teclado normal (WASD + espacio): uno solo posible.
+    if (!lobby_device_joined("keyboard", 0) && keyboard_check_pressed(LOBBY_JOIN_KEY)) {
+        lobby_add_player("keyboard", 0);
+    }
 
-	// TEMPORAL: segundo teclado de testeo (flechas + numpad).
-	if (!lobby_device_joined("keyboard2", 0) && keyboard_check_pressed(LOBBY_JOIN_KEY_TEST)) {
-	    array_push(global.match.players_joined, {
-	        device_type: "keyboard2",
-	        device_index: 0,
-	        ready: false
-	    });
-	}
+    // TEMPORAL: segundo teclado de testeo (flechas + numpad).
+    if (!lobby_device_joined("keyboard2", 0) && keyboard_check_pressed(LOBBY_JOIN_KEY_TEST)) {
+        lobby_add_player("keyboard2", 0);
+    }
 
     // Gamepads conectados (mismo botón que el salto: gp_face1).
     for (var g = 0; g < 12; g++) {
         if (!gamepad_is_connected(g)) continue;
         if (lobby_device_joined("gamepad", g)) continue;
-        if (gamepad_button_check_pressed(g, gp_face1)) {
-            array_push(global.match.players_joined, {
-                device_type: "gamepad",
-                device_index: g,
-                ready: false
-            });
-        }
-        if (array_length(global.match.players_joined) >= MAX_PLAYERS) break;
+        if (gamepad_button_check_pressed(g, gp_face1)) lobby_add_player("gamepad", g);
     }
 }
