@@ -77,7 +77,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2026.0.0.16",
+    "IDEVersion":"2024.14.4.222",
   },
   "name":"Proyecto Videojuegos 2D",
   "resources":[
@@ -209,6 +209,7 @@
     {"id":{"name":"spr_bg_91","path":"sprites/spr_bg_91/spr_bg_91.yy",},},
     {"id":{"name":"spr_bg_92","path":"sprites/spr_bg_92/spr_bg_92.yy",},},
     {"id":{"name":"spr_bullet","path":"sprites/spr_bullet/spr_bullet.yy",},},
+    {"id":{"name":"spr_merchant","path":"sprites/spr_merchant/spr_merchant.yy",},},
     {"id":{"name":"spr_obj_weapon","path":"sprites/spr_obj_weapon/spr_obj_weapon.yy",},},
     {"id":{"name":"spr_player_arm","path":"sprites/spr_player_arm/spr_player_arm.yy",},},
     {"id":{"name":"spr_player_crouch","path":"sprites/spr_player_crouch/spr_player_crouch.yy",},},
