@@ -33,15 +33,18 @@ function player_release_weapon(_in) {
     held_weapon = noone;
 
     if (_in.up_held) {
-        weapon_eject(_w, _hx, _hy, facing, hsp, -WEAPON_THROW_UP_SPEED, -WEAPON_THROW_SPIN * facing);
+        // CAMBIO: hacia arriba, sin velocidad horizontal (biblia 4.4.4). Antes pasaba hsp.
+        weapon_eject(_w, _hx, _hy, facing, 0, -WEAPON_THROW_UP_SPEED, -WEAPON_THROW_SPIN * facing);
     } else if (abs(hsp) > WEAPON_THROW_MIN_SPEED) {
-        weapon_eject(_w, _hx, _hy, facing, hsp + sign(hsp) * WEAPON_THROW_SPEED,
+        // CAMBIO: velocidad ABSOLUTA, ya no se le suma hsp. Con la gravedad nueva volaría demasiado lejos.
+        weapon_eject(_w, _hx, _hy, facing, sign(hsp) * WEAPON_THROW_SPEED,
                      WEAPON_THROW_LIFT, -WEAPON_THROW_SPIN * sign(hsp));
     } else {
         weapon_eject(_w, _hx, _hy, facing, facing * WEAPON_DROP_SPEED,
                      WEAPON_DROP_LIFT, -WEAPON_DROP_SPIN * facing);
     }
 }
+
 /// @desc Intenta disparar el arma sostenida. Aplica el retroceso al jugador.
 /// @param {Struct} _in Input del frame.
 function player_try_fire(_in) {
@@ -57,10 +60,29 @@ function player_try_fire(_in) {
 
     // Las balas salen desde la mano, la misma donde se dibuja el arma.
     if (weapon_try_fire(held_weapon, player_hand_x(_aim), player_hand_y(_aim), _aim, id)) {
-        // El retroceso usa la dirección BASE, no la del kick, para que el
-        // jugador no se sacuda de forma errática.
-        var _recoil = held_weapon.def.recoil;
-        hsp -= lengthdir_x(_recoil, _base);
-        vsp -= lengthdir_y(_recoil, _base);
+        // CAMBIO: las 3 líneas viejas del retroceso (_recoil, hsp -=, vsp -=) se reemplazan por esta llamada.
+        // Usa la dirección BASE, no la del kick, para que el jugador no se sacuda de forma errática.
+        player_apply_kick(held_weapon.def.recoil, _base);
     }
+}
+
+/// @desc Retroceso al jugador, como Duck Game (biblia 4.3.1 P8): el empuje horizontal
+///       REEMPLAZA a hsp si va en contra o es mayor (no se suma), y el vertical suma
+///       el componente del cañón menos un tercio de la fuerza hacia arriba.
+/// @param {Real} _force Fuerza de retroceso del arma (def.recoil).
+/// @param {Real} _angle Dirección BASE del apuntado, sin kick (0 derecha, 90 arriba).
+function player_apply_kick(_force, _angle) {
+    var _kx = -lengthdir_x(_force, _angle);
+    var _ky = -lengthdir_y(_force, _angle);
+
+    // DECISIÓN: se ignora el horizontal si apunta recto arriba o abajo (_kx casi 0).
+    if (abs(_kx) > 0.001 && (sign(hsp) != sign(_kx) || abs(_kx) > abs(hsp))) hsp = _kx;
+
+    vsp += _ky - _force * WEAPON_KICK_LIFT;
+
+    // Disparar agachado inicia un slide hacia atrás (biblia 4.4.3), siempre que el
+    // retroceso tenga componente horizontal. Apuntando recto arriba _kx es ~0 y no hay
+    // nada que deslizar. DECISIÓN: no se mira la velocidad resultante, porque armas de
+    // retroceso bajo (SMG, kick 1) nunca superarían PLAYER_SLIDE_MIN_SPEED.
+    if (crouching && abs(_kx) > 0.001) sliding = true;
 }

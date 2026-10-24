@@ -1,10 +1,12 @@
-// La capa GUI (texto, botones) se dibuja al tamaño REAL de la pantalla,
-// no a los 640x360 del juego, así el texto sale nítido en cualquier
-// ventana o en fullscreen. Se revisa cada Step porque el tamaño puede
-// cambiar en cualquier momento (fullscreen, resize, rotar el celular).
+// La capa GUI (texto, botones) se dibuja al tamaño REAL de la pantalla, no a los
+// 320x180 del mundo, así el texto sale nítido en cualquier ventana o en fullscreen.
+// Se revisa cada Step porque el tamaño puede cambiar en cualquier momento
+// (fullscreen, resize, rotar el celular).
 var _win_w = window_get_width();
 var _win_h = window_get_height();
-if (display_get_gui_width() != _win_w || display_get_gui_height() != _win_h) {
+
+// Con la ventana minimizada el tamaño es 0 y display_set_gui_size fallaría.
+if (_win_w > 0 && _win_h > 0 && (display_get_gui_width() != _win_w || display_get_gui_height() != _win_h)) {
     display_set_gui_size(_win_w, _win_h);
 }
 

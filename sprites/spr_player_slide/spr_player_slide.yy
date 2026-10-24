@@ -19,6 +19,8 @@
   "height":32,
   "HTile":false,
   "layers":[
+    {"$GMImageLayer":"","%Name":"6885ff1a-7834-4f2a-ba32-79deb4e99fcf","blendMode":0,"displayName":"Layer 1","isLocked":false,"name":"6885ff1a-7834-4f2a-ba32-79deb4e99fcf","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
+    {"$GMImageLayer":"","%Name":"4a63f619-f03a-4d1c-a0ba-86db1dd6e902","blendMode":0,"displayName":"default (2)","isLocked":false,"name":"4a63f619-f03a-4d1c-a0ba-86db1dd6e902","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":false,},
     {"$GMImageLayer":"","%Name":"6c535a7f-dbc6-47c2-9532-e15fc761b291","blendMode":0,"displayName":"default","isLocked":false,"name":"6c535a7f-dbc6-47c2-9532-e15fc761b291","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
     {"$GMImageLayer":"","%Name":"1cfe2f95-5bd5-4d1b-ba6c-827002e2b173","blendMode":0,"displayName":"Cola","isLocked":false,"name":"1cfe2f95-5bd5-4d1b-ba6c-827002e2b173","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
     {"$GMImageLayer":"","%Name":"f2857286-f32b-4dfc-af6f-29b21299a1d9","blendMode":0,"displayName":"Cabeza","isLocked":false,"name":"f2857286-f32b-4dfc-af6f-29b21299a1d9","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},

@@ -20,6 +20,7 @@
   "HTile":false,
   "layers":[
     {"$GMImageLayer":"","%Name":"6715f255-2634-40e4-a217-0b8e51eabf94","blendMode":0,"displayName":"cabeza","isLocked":false,"name":"6715f255-2634-40e4-a217-0b8e51eabf94","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
+    {"$GMImageLayer":"","%Name":"4c544afc-aeed-4992-9d40-ef60aa0ab7d8","blendMode":0,"displayName":"default (2)","isLocked":false,"name":"4c544afc-aeed-4992-9d40-ef60aa0ab7d8","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":false,},
     {"$GMImageLayer":"","%Name":"76a8c027-64ad-4fc3-b834-52ce86e77dd3","blendMode":0,"displayName":"default","isLocked":false,"name":"76a8c027-64ad-4fc3-b834-52ce86e77dd3","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
     {"$GMImageLayer":"","%Name":"a245aea8-c8a4-4be6-ab36-2ac25c32e79f","blendMode":0,"displayName":"Cola","isLocked":false,"name":"a245aea8-c8a4-4be6-ab36-2ac25c32e79f","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],

@@ -21,7 +21,7 @@ function WeaponDef() constructor {
     damage       = 1;    // 1 = muerte de un golpe (pilar de diseño de DuckGame)
     ammo_max     = 6;
     fire_delay   = 15;   // frames entre disparos
-    recoil       = 2;    // empuje al jugador al disparar
+	recoil       = 3;    // fuerza de retroceso al jugador (_kickForce de Duck Game, biblia 4.3.1 P8)
     bullet_speed = 12;
     bullets      = 1;    // proyectiles por disparo (escopeta > 1)
     spread       = 0;    // dispersión aleatoria de CADA bala, en grados
@@ -55,7 +55,7 @@ function weapon_data_init() {
     _shotgun.sprite        = spr_weapon_gun_2;
     _shotgun.ammo_max      = 2;
     _shotgun.fire_delay    = 30;
-    _shotgun.recoil        = 6;
+    _shotgun.recoil        = 4;
     _shotgun.bullets       = 6;
     _shotgun.spread        = 20;
     _shotgun.muzzle_x      = 70;
@@ -70,7 +70,6 @@ function weapon_data_init() {
     _magnum.sprite        = spr_weapon_gun_1;   // TEMPORAL: sprite prestado de la pistola
     _magnum.ammo_max      = 6;
     _magnum.fire_delay    = 25;
-    _magnum.recoil        = 3;
     _magnum.bullet_speed  = 16;
     _magnum.muzzle_x      = 22;
     _magnum.kick_up       = 18;
@@ -85,7 +84,7 @@ function weapon_data_init() {
     _smg.automatic     = true;
     _smg.ammo_max      = 30;
     _smg.fire_delay    = 4;
-    _smg.recoil        = 0.6;
+    _smg.recoil        = 1;
     _smg.bullet_speed  = 14;
     _smg.bullet_life   = 40;
     _smg.muzzle_x      = 22;

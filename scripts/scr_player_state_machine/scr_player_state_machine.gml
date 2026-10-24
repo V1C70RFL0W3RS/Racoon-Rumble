@@ -1,23 +1,30 @@
-/// @description Actualiza el estado del jugador para este frame, según su física e input actual.
+/// @description Actualiza el estado del jugador para este frame, según su física actual.
 /// @param {Id.Instance} player  La instancia de obj_player a actualizar.
-/// @param {Struct} input        El struct devuelto por get_player_input().
+/// @param {Struct} input        El struct devuelto por get_player_input() (hoy sin uso aquí).
 function player_update_state(player, input) {
     with (player) {
+        // Agachado y slide los deciden las banderas de física (player_update_crouch):
+        // tienen prioridad mientras estén activas. Al soltarlas se vuelve a IDLE y el
+        // switch de abajo afina (RUN, FALL...) en este mismo frame.
+        if (state != PLAYER_STATE.HURT && state != PLAYER_STATE.DEAD) {
+            if (sliding)        state = PLAYER_STATE.SLIDE;
+            else if (crouching) state = PLAYER_STATE.CROUCH;
+            else if (state == PLAYER_STATE.CROUCH || state == PLAYER_STATE.SLIDE) state = PLAYER_STATE.IDLE;
+        }
+
         switch (state) {
             case PLAYER_STATE.IDLE:
-                if (!is_grounded)         { state = PLAYER_STATE.FALL; break; }
-                if (abs(hsp) > 0.5)       { state = PLAYER_STATE.RUN;  break; }
-                if (input.down_held)      { state = PLAYER_STATE.SLIDE; break; }
+                if (!is_grounded)    { state = PLAYER_STATE.FALL; break; }
+                if (abs(hsp) > 0.5)  { state = PLAYER_STATE.RUN;  break; }
                 break;
 
             case PLAYER_STATE.RUN:
-                if (!is_grounded)         { state = PLAYER_STATE.FALL; break; }
-                if (abs(hsp) <= 0.5)      { state = PLAYER_STATE.IDLE; break; }
-                if (input.down_held)      { state = PLAYER_STATE.SLIDE; break; }
+                if (!is_grounded)    { state = PLAYER_STATE.FALL; break; }
+                if (abs(hsp) <= 0.5) { state = PLAYER_STATE.IDLE; break; }
                 break;
 
             case PLAYER_STATE.JUMP:
-                if (vsp >= 0)             { state = PLAYER_STATE.FALL; break; } // llegó al punto más alto, empieza a caer
+                if (vsp >= 0)        { state = PLAYER_STATE.FALL; break; } // llegó al punto más alto, empieza a caer
                 break;
 
             case PLAYER_STATE.FALL:
@@ -27,9 +34,9 @@ function player_update_state(player, input) {
                 }
                 break;
 
+            case PLAYER_STATE.CROUCH:
             case PLAYER_STATE.SLIDE:
-                if (!is_grounded)                        { state = PLAYER_STATE.FALL; break; }
-                if (!input.down_held || abs(hsp) <= 0.5) { state = PLAYER_STATE.IDLE; break; }
+                // Decididos arriba por las banderas.
                 break;
 
             case PLAYER_STATE.HURT:

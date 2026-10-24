@@ -25,6 +25,9 @@ if (array_length(_col_v) > 0) {
     vsp = 0;
 }
 
+// CAMBIO: fricción en el aire (Duck Game: la del suelo × 0.7). Solo si no aterrizó este frame.
+if (!_landed) hsp = approach(hsp, 0, WEAPON_AIR_FRICTION);
+
 // Rotación: gira en el aire; al aterrizar decide si queda de pie o acostada.
 if (_landed) {
     spin = 0;

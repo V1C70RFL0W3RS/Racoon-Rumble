@@ -5,4 +5,6 @@
 cam    = noone;
 view_w = CAMERA_VIEW_W;
 view_h = CAMERA_VIEW_H;
-snap_next = true; // fuerza que el próximo Step ubique la cámara sin interpolar
+center_x = 0;      // centro de la cámara en el mundo, SIN redondear (se redondea solo al aplicarlo)
+center_y = 0;
+snap_next = true;  // fuerza que el próximo Step ubique la cámara sin interpolar
