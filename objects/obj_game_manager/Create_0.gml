@@ -10,3 +10,5 @@ if (os_type == os_windows) {
     window_set_size(CAMERA_VIEW_W * 4, CAMERA_VIEW_H * 4);
     window_center();
 }
+
+corpse_joint_init();

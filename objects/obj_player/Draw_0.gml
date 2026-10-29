@@ -9,7 +9,7 @@ palette_reset();
 
 // 2. Arma (sin color), en la mano
 if (held_weapon != noone) {
-    weapon_draw_held(held_weapon, player_hand_x(_ang), player_hand_y(_ang), facing, _ang);
+    holdable_draw_held(held_weapon, player_hand_x(_ang), player_hand_y(_ang), facing, _ang);
 }
 
 // 3. Brazo (con color), encima del arma
@@ -17,4 +17,5 @@ palette_apply(_color);
 player_draw_arm(_ang);
 palette_reset();
 
-player_debug_arm(_ang); // TEMPORAL
+if (DEBUG_TOOLS) player_debug_arm(_ang);          // TEMPORAL
+if (DEBUG_TOOLS) corpse_debug_draw_joint();       // TEMPORAL

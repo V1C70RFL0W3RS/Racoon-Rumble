@@ -1,6 +1,8 @@
 /// @description Constantes globales del juego. Único lugar donde viven los "números mágicos".
 /// Organizado por sistema. Al agregar una macro, ponla en su sección (no al final del archivo).
 
+#macro DEBUG_TOOLS true
+
 // =============================================================================
 // JUGADORES
 // =============================================================================
@@ -53,30 +55,51 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 // =============================================================================
 #macro GRAVITY 0.2
 
+
+
+// =============================================================================
+// Cadáver
+// =============================================================================
+#macro CORPSE_INERTIA         0.5   // fracción de la velocidad del jugador que heredan (biblia 4.4.5)
+#macro CORPSE_POP_SPEED       -2    // saltito hacia arriba al morir
+#macro CORPSE_LINK_MIN        10    // distancia mínima entre centros: debajo de esto se empujan (no se encimen)
+#macro CORPSE_LINK_MAX        14    // distancia máxima: arriba de esto la cuerda las jala
+#macro CORPSE_SPAWN_JOINT_Y   0   // altura del punto de unión sobre los pies al morir (a ojo: la cintura)
+#macro CORPSE_SNAP_FACTOR  5     // si las piezas se separan más de 5 veces su distancia, se reencuentran
+#macro HOLDABLE_MAX_HSP    12    // tope de velocidad horizontal de todo objeto agarrable (biblia 4.3)
+#macro HOLDABLE_MAX_VSP    8     // tope de velocidad vertical
+
+
+#macro CORPSE_AIR_FRICTION_MULT  0.3    // biblia 4.4.5 E: 70 % menos resistencia al aire
+#macro CORPSE_BOUNCE             0.6    // rebota con el 60 % de su velocidad
+#macro CORPSE_DRAW_SLACK         2      // px que puede estirarse el dibujo antes de recortarlo
+#macro HOLDABLE_BOUNCE_MIN_SPEED 1.5    // por debajo de esto no rebota: se posa
+#macro HOLDABLE_MAX_PUSHOUT   32   // máximo que se mueve un holdable incrustado para salir del mapa
+#macro CORPSE_SPAWN_PUSHOUT   24   // máximo que se mueve el cadáver entero al nacer
 // =============================================================================
 // ARMAS
 // =============================================================================
 // --- Agarrar y soltar ---
-#macro WEAPON_GRAB_RADIUS     24        // distancia máxima para agarrar un arma
-#macro WEAPON_MAX_PUSHOUT     96        // máximo de px que se busca un lugar libre si nace solapada
+#macro HOLDABLE_GRAB_RADIUS     24        // distancia máxima para agarrar un arma
+#macro HOLDABLE_OVERLAP_PUSHOUT     96        // máximo de px que se busca un lugar libre si nace solapada
 
 // --- Lanzamiento ---
-#macro WEAPON_THROW_MIN_SPEED 0.5       // si abs(hsp) supera esto, "se está moviendo" → lanza
-#macro WEAPON_THROW_SPEED     7.5     // velocidad horizontal ABSOLUTA al lanzar corriendo
-#macro WEAPON_THROW_LIFT     -2
-#macro WEAPON_THROW_UP_SPEED  5       // lanzar hacia arriba
-#macro WEAPON_THROW_SPIN      14        // grados por frame que gira al lanzarla
+#macro HOLDABLE_THROW_MIN_SPEED 0.5       // si abs(hsp) supera esto, "se está moviendo" → lanza
+#macro HOLDABLE_THROW_SPEED     7.5     // velocidad horizontal ABSOLUTA al lanzar corriendo
+#macro HOLDABLE_THROW_LIFT     -2
+#macro HOLDABLE_THROW_UP_SPEED  5       // lanzar hacia arriba
+#macro HOLDABLE_THROW_SPIN      14        // grados por frame que gira al lanzarla
 
 // --- Soltar quieto ---
-#macro WEAPON_DROP_SPEED      3         // impulso horizontal al soltarla quieto (suave)
-#macro WEAPON_DROP_LIFT      -2         // pequeño impulso hacia arriba, para que haga un arco corto
-#macro WEAPON_DROP_SPIN       3         // giro suave al soltarla quieto
+#macro HOLDABLE_DROP_SPEED      3         // impulso horizontal al soltarla quieto (suave)
+#macro HOLDABLE_DROP_LIFT      -2         // pequeño impulso hacia arriba, para que haga un arco corto
+#macro HOLDABLE_DROP_SPIN       3         // giro suave al soltarla quieto
 
 // --- Arma suelta en el mundo ---
-#macro WEAPON_GROUND_FRICTION 0.25
-#macro WEAPON_WALL_BOUNCE     0.4       // fracción de velocidad que conserva al rebotar en una pared
-#macro WEAPON_SETTLE_RATE     0.25      // qué rápido se endereza al aterrizar (0 a 1)
-#macro WEAPON_AIR_FRICTION    0.175   // 0.25 × 0.7
+#macro HOLDABLE_GROUND_FRICTION 0.25
+#macro HOLDABLE_WALL_BOUNCE     0.4       // fracción de velocidad que conserva al rebotar en una pared
+#macro HOLDABLE_SETTLE_RATE     0.25      // qué rápido se endereza al aterrizar (0 a 1)
+#macro HOLDABLE_AIR_FRICTION    0.175   // 0.25 × 0.7
 
 // --- Retroceso (biblia P8) ---
 #macro WEAPON_KICK_LIFT       0.333   // fracción del retroceso que empuja al jugador hacia arriba

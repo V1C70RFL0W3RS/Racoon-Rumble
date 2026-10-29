@@ -75,7 +75,8 @@ function player_update_arm_raise() {
             // DECISIÓN: se prueba SIEMPRE con el ángulo de slide sin levantar. Si se probara
             // con el brazo ya levantado, éste "liberaría" la pared, volvería a bajar y parpadearía.
             var _ang = player_get_slide_aim_angle();
-            var _len = PLAYER_ARM_LENGTH + held_weapon.def.muzzle_x + PLAYER_ARM_WALL_MARGIN;
+            var _muzzle = held_weapon.fires ? held_weapon.def.muzzle_x : 0;
+            var _len = PLAYER_ARM_LENGTH + _muzzle + PLAYER_ARM_WALL_MARGIN;
             var _sx  = player_shoulder_x();
             var _sy  = player_shoulder_y();
 

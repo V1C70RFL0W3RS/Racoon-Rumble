@@ -11,7 +11,7 @@ function player_update_weapon(_in) {
 /// @desc Toma el arma suelta más cercana, si hay alguna al alcance.
 function player_grab_weapon() {
     // Se busca a la altura del pecho (el hombro): HAND_OFFSET ya no se usa.
-    var _w = weapon_find_grabbable(x, y + PLAYER_SHOULDER_Y);
+    var _w = holdable_find_grabbable(x, y + PLAYER_SHOULDER_Y);
     if (_w == noone) return;
 
     _w.holder = id;
@@ -34,14 +34,14 @@ function player_release_weapon(_in) {
 
     if (_in.up_held) {
         // CAMBIO: hacia arriba, sin velocidad horizontal (biblia 4.4.4). Antes pasaba hsp.
-        weapon_eject(_w, _hx, _hy, facing, 0, -WEAPON_THROW_UP_SPEED, -WEAPON_THROW_SPIN * facing);
-    } else if (abs(hsp) > WEAPON_THROW_MIN_SPEED) {
+        holdable_eject(_w, _hx, _hy, facing, 0, -HOLDABLE_THROW_UP_SPEED, -HOLDABLE_THROW_SPIN * facing);
+    } else if (abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
         // CAMBIO: velocidad ABSOLUTA, ya no se le suma hsp. Con la gravedad nueva volaría demasiado lejos.
-        weapon_eject(_w, _hx, _hy, facing, sign(hsp) * WEAPON_THROW_SPEED,
-                     WEAPON_THROW_LIFT, -WEAPON_THROW_SPIN * sign(hsp));
+        holdable_eject(_w, _hx, _hy, facing, sign(hsp) * HOLDABLE_THROW_SPEED,
+                     HOLDABLE_THROW_LIFT, -HOLDABLE_THROW_SPIN * sign(hsp));
     } else {
-        weapon_eject(_w, _hx, _hy, facing, facing * WEAPON_DROP_SPEED,
-                     WEAPON_DROP_LIFT, -WEAPON_DROP_SPIN * facing);
+        holdable_eject(_w, _hx, _hy, facing, facing * HOLDABLE_DROP_SPEED,
+                     HOLDABLE_DROP_LIFT, -HOLDABLE_DROP_SPIN * facing);
     }
 }
 
@@ -49,6 +49,7 @@ function player_release_weapon(_in) {
 /// @param {Struct} _in Input del frame.
 function player_try_fire(_in) {
     if (held_weapon == noone) return;
+	if (!held_weapon.fires) return;   // solo las armas disparan
 
     // Automática: alcanza con mantener el botón. Semiautomática: un clic por disparo.
     var _wants_fire = held_weapon.def.automatic ? _in.fire_held : _in.fire_pressed;
@@ -85,4 +86,21 @@ function player_apply_kick(_force, _angle) {
     // nada que deslizar. DECISIÓN: no se mira la velocidad resultante, porque armas de
     // retroceso bajo (SMG, kick 1) nunca superarían PLAYER_SLIDE_MIN_SPEED.
     if (crouching && abs(_kx) > 0.001) sliding = true;
+}
+
+/// @desc Lleva lo que sostiene el jugador a su mano. Sin esto, un objeto en la mano
+///       se queda en el lugar donde se agarró (solo se dibujaba en la mano), y cualquier
+///       cosa que dependa de su posición (la otra mitad de un cadáver colgando, por
+///       ejemplo) no se enteraría de que se movió.
+function player_update_held_position() {
+    if (held_weapon == noone) return;
+    var _ang = player_get_arm_angle();
+    var _hx  = player_hand_x(_ang);
+    var _hy  = player_hand_y(_ang);
+
+    // Se guarda cómo se dibuja, por si el objeto lo necesita (ver corpse_joint_x).
+    held_weapon.held_angle  = _ang;
+    held_weapon.held_facing = facing;
+    held_weapon.x = holdable_held_x(held_weapon, _hx, facing, _ang);
+    held_weapon.y = holdable_held_y(held_weapon, _hy, facing, _ang);
 }

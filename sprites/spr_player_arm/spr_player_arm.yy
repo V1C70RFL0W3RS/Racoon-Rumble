@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":9,
   "parent":{
-    "name":"test",
-    "path":"folders/Sprites/Players/Racoon/test.yy",
+    "name":"Racoon",
+    "path":"folders/Sprites/Players/Racoon.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

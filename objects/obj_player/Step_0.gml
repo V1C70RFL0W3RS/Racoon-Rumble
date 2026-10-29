@@ -12,8 +12,12 @@ player_try_fire(_in);
 player_update_movement(_in);
 player_update_state(id, _in);
 player_update_animation();
-player_debug_tune_shoulder();   // TEMPORAL
+player_update_held_position();
+if (DEBUG_TOOLS) player_debug_tune_shoulder();   // TEMPORAL
+if (DEBUG_TOOLS) corpse_debug_tune_joint();      // TEMPORAL
 
 if (y > room_height + ROOM_FALL_KILL_MARGIN) {
     player_die();
 }
+
+

@@ -30,8 +30,8 @@
   "nineSlice":null,
   "origin":9,
   "parent":{
-    "name":"Racoon",
-    "path":"folders/Sprites/Players/Racoon.yy",
+    "name":"dec",
+    "path":"folders/Sprites/Players/Racoon/dec.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
