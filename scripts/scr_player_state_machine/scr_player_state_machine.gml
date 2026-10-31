@@ -1,7 +1,6 @@
 /// @description Actualiza el estado del jugador para este frame, según su física actual.
 /// @param {Id.Instance} player  La instancia de obj_player a actualizar.
-/// @param {Struct} input        El struct devuelto por get_player_input() (hoy sin uso aquí).
-function player_update_state(player, input) {
+function player_update_state(player) {
     with (player) {
         // Agachado y slide los deciden las banderas de física (player_update_crouch):
         // tienen prioridad mientras estén activas. Al soltarlas se vuelve a IDLE y el

@@ -8,8 +8,8 @@
 enum WEAPON_ID {
     PISTOL,
     SHOTGUN,
-    MAGNUM,   // NUEVO
-    SMG,      // NUEVO
+    MAGNUM,   
+    SMG,      
     COUNT // truco: siempre queda con el número de armas que existen
 }
 
@@ -28,7 +28,7 @@ function WeaponDef() constructor {
     muzzle_x     = 20;   // distancia desde el agarre hasta la boca del cañón
     bullet_life  = 45;   // frames que vive una bala antes de desaparecer sola
 
-    // NUEVO: "kick" = cambio en la orientación del ARMA (distinto de spread).
+    //"kick" = cambio en la orientación del ARMA (distinto de spread).
     automatic     = false; // true = dispara mientras se mantiene el botón
     kick_up       = 0;     // grados que sube el arma en cada disparo
     kick_jitter   = 0;     // temblor aleatorio (±grados) en cada disparo
@@ -45,7 +45,7 @@ function weapon_data_init() {
     _pistol.sprite        = spr_weapon_gun_1;
     _pistol.ammo_max      = 8;
     _pistol.muzzle_x      = 22;
-    _pistol.kick_up       = 4;     // NUEVO: un golpecito leve
+    _pistol.kick_up       = 4;     
     _pistol.kick_max      = 20;
     _pistol.kick_recovery = 0.5;
     global.weapon_defs[WEAPON_ID.PISTOL] = _pistol;
@@ -59,12 +59,12 @@ function weapon_data_init() {
     _shotgun.bullets       = 6;
     _shotgun.spread        = 20;
     _shotgun.muzzle_x      = 70;
-    _shotgun.kick_up       = 12;   // NUEVO: patada fuerte, se recupera rápido
+    _shotgun.kick_up       = 12; 
     _shotgun.kick_max      = 30;
     _shotgun.kick_recovery = 0.6;
     global.weapon_defs[WEAPON_ID.SHOTGUN] = _shotgun;
 
-    // NUEVO — estilo revólver: sube más con cada disparo y baja despacio.
+   
     var _magnum = new WeaponDef();
     _magnum.name          = "Magnum";
     _magnum.sprite        = spr_weapon_gun_1;   // TEMPORAL: sprite prestado de la pistola
@@ -77,7 +77,6 @@ function weapon_data_init() {
     _magnum.kick_recovery = 0.4;
     global.weapon_defs[WEAPON_ID.MAGNUM] = _magnum;
 
-    // NUEVO — estilo automática: tiembla arriba y abajo, las balas salen desparejas.
     var _smg = new WeaponDef();
     _smg.name          = "SMG";
     _smg.sprite        = spr_weapon_gun_1;      // TEMPORAL: sprite prestado de la pistola

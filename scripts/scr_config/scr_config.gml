@@ -3,6 +3,7 @@
 
 // Activa los afinadores y la depuración temporal (hombro, cadáver). Poner en false para publicar.
 #macro DEBUG_TOOLS true
+#macro Release:DEBUG_TOOLS false
 
 // =============================================================================
 // JUGADORES

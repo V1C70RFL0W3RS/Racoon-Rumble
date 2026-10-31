@@ -92,7 +92,7 @@ function player_update_arm_raise() {
 ///       Sin arma, el brazo cuelga (270), salvo aleteando (arriba) o deslizando (su propia pose).
 function player_get_arm_angle() {
     // TEMPORAL: el afinador puede forzar un ángulo distinto en cada pose y frame.
-    if (shoulder_tune) {
+    if (DEBUG_TOOLS && shoulder_tune) {
         var _forced = tune_angles[tune_pose][tune_frame];
         if (_forced != undefined) return _forced;
     }
@@ -235,7 +235,7 @@ function player_debug_tune_shoulder() {
     if (_dx != 0 || _dy != 0) {
         var _t = player_get_shoulder_table(_spr);
         var _o = _t[tune_frame];
-        player_debug_set_shoulder(_spr, tune_frame, _o[0] + _dx, _o[1] + _dy);
+        if (DEBUG_TOOLS) player_debug_set_shoulder(_spr, tune_frame, _o[0] + _dx, _o[1] + _dy);
     }
 
     // Rotar el brazo de ESTA pose y frame. Ángulo mundial: 0 = derecha, 90 = arriba, 180 = izquierda, 270 = abajo.

@@ -6,11 +6,11 @@ if (variable_struct_exists(global.match, "state") && global.match.state == MATCH
 var _in = get_player_input(player_index);
 player_update_item(_in);
 aim_up = _in.up_held;
-player_update_arm_raise();   // NUEVO
+player_update_arm_raise();   
 player_try_fire(_in);
 
 player_update_movement(_in);
-player_update_state(id, _in);
+player_update_state(id);
 player_update_animation();
 player_update_held_position();
 if (DEBUG_TOOLS) player_debug_tune_shoulder();   // TEMPORAL
