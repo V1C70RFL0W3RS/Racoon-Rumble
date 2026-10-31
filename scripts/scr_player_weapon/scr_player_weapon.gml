@@ -1,27 +1,27 @@
 /// @desc Punto de entrada: agarra o tira según el estado actual. Un solo botón.
 /// @param {Struct} _in Struct devuelto por get_player_input().
-function player_update_weapon(_in) {
+function player_update_item(_in) {
     if (!_in.grab_pressed) return;
 
-    if (held_weapon == noone) player_grab_weapon();
-    else                      player_release_weapon(_in);
+    if (held_item == noone) player_grab_item();
+    else                      player_release_item(_in);
 }
 
 
 /// @desc Toma el arma suelta más cercana, si hay alguna al alcance.
-function player_grab_weapon() {
+function player_grab_item() {
     // Se busca a la altura del pecho (el hombro): HAND_OFFSET ya no se usa.
     var _w = holdable_find_grabbable(x, y + PLAYER_SHOULDER_Y);
     if (_w == noone) return;
 
     _w.holder = id;
-    held_weapon = _w;
+    held_item = _w;
 }
 
 /// @desc Suelta el arma. Mirando arriba la lanza hacia arriba; en movimiento la
 ///       lanza hacia adelante; quieto, la lanza suavemente.
 /// @param {Struct} _in Input del frame actual.
-function player_release_weapon(_in) {
+function player_release_item(_in) {
     // DECISIÓN: el ángulo y la mano se leen ANTES de soltar. Sin arma,
     // player_get_arm_angle() devuelve el brazo colgando (270) y el arma
     // "saltaría" de lugar en el instante de soltarla.
@@ -29,8 +29,8 @@ function player_release_weapon(_in) {
     var _hx  = player_hand_x(_ang);
     var _hy  = player_hand_y(_ang);
 
-    var _w = held_weapon;
-    held_weapon = noone;
+    var _w = held_item;
+    held_item = noone;
 
     if (_in.up_held) {
         // CAMBIO: hacia arriba, sin velocidad horizontal (biblia 4.4.4). Antes pasaba hsp.
@@ -48,11 +48,11 @@ function player_release_weapon(_in) {
 /// @desc Intenta disparar el arma sostenida. Aplica el retroceso al jugador.
 /// @param {Struct} _in Input del frame.
 function player_try_fire(_in) {
-    if (held_weapon == noone) return;
-	if (!held_weapon.fires) return;   // solo las armas disparan
+    if (held_item == noone) return;
+	if (!held_item.fires) return;   // solo las armas disparan
 
     // Automática: alcanza con mantener el botón. Semiautomática: un clic por disparo.
-    var _wants_fire = held_weapon.def.automatic ? _in.fire_held : _in.fire_pressed;
+    var _wants_fire = held_item.def.automatic ? _in.fire_held : _in.fire_pressed;
     if (!_wants_fire) return;
 
     // aim_up ya se actualizó en este Step (antes de llamar a esta función).
@@ -60,10 +60,10 @@ function player_try_fire(_in) {
     var _aim  = player_get_arm_angle();       // dirección real, con el kick del arma
 
     // Las balas salen desde la mano, la misma donde se dibuja el arma.
-    if (weapon_try_fire(held_weapon, player_hand_x(_aim), player_hand_y(_aim), _aim, id)) {
+    if (weapon_try_fire(held_item, player_hand_x(_aim), player_hand_y(_aim), _aim, id)) {
         // CAMBIO: las 3 líneas viejas del retroceso (_recoil, hsp -=, vsp -=) se reemplazan por esta llamada.
         // Usa la dirección BASE, no la del kick, para que el jugador no se sacuda de forma errática.
-        player_apply_kick(held_weapon.def.recoil, _base);
+        player_apply_kick(held_item.def.recoil, _base);
     }
 }
 
@@ -93,14 +93,14 @@ function player_apply_kick(_force, _angle) {
 ///       cosa que dependa de su posición (la otra mitad de un cadáver colgando, por
 ///       ejemplo) no se enteraría de que se movió.
 function player_update_held_position() {
-    if (held_weapon == noone) return;
+    if (held_item == noone) return;
     var _ang = player_get_arm_angle();
     var _hx  = player_hand_x(_ang);
     var _hy  = player_hand_y(_ang);
 
     // Se guarda cómo se dibuja, por si el objeto lo necesita (ver corpse_joint_x).
-    held_weapon.held_angle  = _ang;
-    held_weapon.held_facing = facing;
-    held_weapon.x = holdable_held_x(held_weapon, _hx, facing, _ang);
-    held_weapon.y = holdable_held_y(held_weapon, _hy, facing, _ang);
+    held_item.held_angle  = _ang;
+    held_item.held_facing = facing;
+    held_item.x = holdable_held_x(held_item, _hx, facing, _ang);
+    held_item.y = holdable_held_y(held_item, _hy, facing, _ang);
 }

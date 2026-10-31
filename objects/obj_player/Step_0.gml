@@ -4,7 +4,7 @@ if (state == PLAYER_STATE.DEAD) exit;
 if (variable_struct_exists(global.match, "state") && global.match.state == MATCH_STATE.COUNTDOWN) exit;
 
 var _in = get_player_input(player_index);
-player_update_weapon(_in);
+player_update_item(_in);
 aim_up = _in.up_held;
 player_update_arm_raise();   // NUEVO
 player_try_fire(_in);

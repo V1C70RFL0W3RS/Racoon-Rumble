@@ -31,9 +31,9 @@ function player_die() {
     visible = false;   // con visible = false, GameMaker no ejecuta el Draw
 
     // El arma que llevaba salta por los aires en vez de desaparecer.
-    if (held_weapon != noone) {
-        var _w = held_weapon;
-        held_weapon = noone;
+    if (held_item != noone) {
+        var _w = held_item;
+        held_item = noone;
         holdable_eject(_w, _hx, _hy, facing, random_range(-2, 2), -4, random_range(-10, 10));
     }
 

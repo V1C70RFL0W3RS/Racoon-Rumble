@@ -3,7 +3,7 @@ if (holder != noone) exit;
 
 holdable_depenetrate(id);   // si nació o quedó incrustado, sale por el lado más corto
 
-vsp += GRAVITY;
+vsp += HOLDABLE_GRAVITY;
 // Salvaguarda: nada agarrable supera estas velocidades, pase lo que pase.
 hsp = clamp(hsp, -HOLDABLE_MAX_HSP, HOLDABLE_MAX_HSP);
 vsp = clamp(vsp, -HOLDABLE_MAX_VSP, HOLDABLE_MAX_VSP);

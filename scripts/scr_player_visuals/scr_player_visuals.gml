@@ -68,14 +68,14 @@ function player_get_slide_aim_angle() {
 function player_update_arm_raise() {
     var _target = 0;
 
-    if (held_weapon != noone) {
+    if (held_item != noone) {
         if (hovering) {
             _target = 1;
         } else if (sliding) {
             // DECISIÓN: se prueba SIEMPRE con el ángulo de slide sin levantar. Si se probara
             // con el brazo ya levantado, éste "liberaría" la pared, volvería a bajar y parpadearía.
             var _ang = player_get_slide_aim_angle();
-            var _muzzle = held_weapon.fires ? held_weapon.def.muzzle_x : 0;
+            var _muzzle = held_item.fires ? held_item.def.muzzle_x : 0;
             var _len = PLAYER_ARM_LENGTH + _muzzle + PLAYER_ARM_WALL_MARGIN;
             var _sx  = player_shoulder_x();
             var _sy  = player_shoulder_y();
@@ -97,12 +97,12 @@ function player_get_arm_angle() {
         if (_forced != undefined) return _forced;
     }
 
-    if (held_weapon == noone) {
+    if (held_item == noone) {
         if (hovering) return 90;
         if (sliding)  return (facing == 1) ? PLAYER_SLIDE_ARM_FREE_DEG : 180 - PLAYER_SLIDE_ARM_FREE_DEG;
         return 270;
     }
-    return weapon_get_aim_angle(held_weapon, player_get_base_aim_angle(), facing);
+    return weapon_get_aim_angle(held_item, player_get_base_aim_angle(), facing);
 }
 /// @desc Posición X de la mano (agarre del arma) para un ángulo de brazo dado.
 function player_hand_x(_angle) {
