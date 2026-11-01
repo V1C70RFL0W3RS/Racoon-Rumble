@@ -18,16 +18,14 @@ enum WEAPON_ID {
 function WeaponDef() constructor {
     name         = "Arma";
     sprite       = -1;   // sprite del arma (spr_weapon_*)
-    damage       = 1;    // 1 = muerte de un golpe (pilar de diseño de DuckGame)
     ammo_max     = 6;
     fire_delay   = 15;   // frames entre disparos
 	recoil       = 3;    // fuerza de retroceso al jugador (_kickForce de Duck Game, biblia 4.3.1 P8)
-    bullet_speed = 12;
     bullets      = 1;    // proyectiles por disparo (escopeta > 1)
     spread       = 0;    // dispersión aleatoria de CADA bala, en grados
-    muzzle_x     = 20;   // distancia desde el agarre hasta la boca del cañón
-    bullet_life  = 45;   // frames que vive una bala antes de desaparecer sola
-
+    muzzle_x     = 20;   // distancia desde el agarre hasta la boca del cañón, a lo largo del arma
+    muzzle_y     = 0;    // desvío perpendicular de la boca (+ = hacia abajo en el sprite)
+    ammo_id      = AMMO_ID.LIGHT;   // tipo de bala (ver scr_ammo_data)
     //"kick" = cambio en la orientación del ARMA (distinto de spread).
     automatic     = false; // true = dispara mientras se mantiene el botón
     kick_up       = 0;     // grados que sube el arma en cada disparo
@@ -44,7 +42,8 @@ function weapon_data_init() {
     _pistol.name          = "Pistola";
     _pistol.sprite        = spr_weapon_gun_1;
     _pistol.ammo_max      = 8;
-    _pistol.muzzle_x      = 22;
+	_pistol.muzzle_x      = 15;
+	_pistol.muzzle_y      = -5;
     _pistol.kick_up       = 4;     
     _pistol.kick_max      = 20;
     _pistol.kick_recovery = 0.5;
@@ -58,7 +57,9 @@ function weapon_data_init() {
     _shotgun.recoil        = 4;
     _shotgun.bullets       = 6;
     _shotgun.spread        = 20;
-    _shotgun.muzzle_x      = 70;
+	_shotgun.muzzle_x      = 48;
+	_shotgun.muzzle_y      = -9.5;
+	_shotgun.ammo_id = AMMO_ID.PELLET;
     _shotgun.kick_up       = 12; 
     _shotgun.kick_max      = 30;
     _shotgun.kick_recovery = 0.6;
@@ -70,8 +71,9 @@ function weapon_data_init() {
     _magnum.sprite        = spr_weapon_gun_1;   // TEMPORAL: sprite prestado de la pistola
     _magnum.ammo_max      = 6;
     _magnum.fire_delay    = 25;
-    _magnum.bullet_speed  = 16;
-    _magnum.muzzle_x      = 22;
+	_magnum.muzzle_x      = 15;
+	_magnum.muzzle_y      = -5;
+	_magnum.ammo_id = AMMO_ID.HEAVY;
     _magnum.kick_up       = 18;
     _magnum.kick_max      = 60;
     _magnum.kick_recovery = 0.4;
@@ -84,9 +86,8 @@ function weapon_data_init() {
     _smg.ammo_max      = 30;
     _smg.fire_delay    = 4;
     _smg.recoil        = 1;
-    _smg.bullet_speed  = 14;
-    _smg.bullet_life   = 40;
-    _smg.muzzle_x      = 22;
+	_smg.muzzle_x      = 15;
+	_smg.muzzle_y      = -5;
     _smg.kick_jitter   = 4;
     _smg.kick_max      = 15;
     _smg.kick_recovery = 0.6;

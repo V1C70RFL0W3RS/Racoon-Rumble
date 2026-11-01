@@ -19,3 +19,6 @@ palette_reset();
 
 if (DEBUG_TOOLS) player_debug_arm(_ang);          // TEMPORAL
 if (DEBUG_TOOLS) corpse_debug_draw_joint();       // TEMPORAL
+if (DEBUG_TOOLS && held_item != noone && held_item.fires) {
+    weapon_debug_muzzle(held_item, player_hand_x(_ang), player_hand_y(_ang), _ang, facing);   // TEMPORAL
+}

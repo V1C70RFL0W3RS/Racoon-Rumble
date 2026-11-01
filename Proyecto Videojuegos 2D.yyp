@@ -106,6 +106,7 @@
     {"id":{"name":"rm_map_sandbox","path":"rooms/rm_map_sandbox/rm_map_sandbox.yy",},},
     {"id":{"name":"rm_menu","path":"rooms/rm_menu/rm_menu.yy",},},
     {"id":{"name":"rm_test","path":"rooms/rm_test/rm_test.yy",},},
+    {"id":{"name":"scr_ammo_data","path":"scripts/scr_ammo_data/scr_ammo_data.yy",},},
     {"id":{"name":"scr_config","path":"scripts/scr_config/scr_config.yy",},},
     {"id":{"name":"scr_corpse","path":"scripts/scr_corpse/scr_corpse.yy",},},
     {"id":{"name":"scr_holdable","path":"scripts/scr_holdable/scr_holdable.yy",},},

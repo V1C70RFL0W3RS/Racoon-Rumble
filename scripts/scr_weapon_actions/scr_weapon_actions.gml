@@ -1,3 +1,18 @@
+/// @file scr_weapon_actions
+
+/// @desc Punto de la boca del cañón en el mundo. ÚNICO lugar que lo calcula
+///       (lo usan el disparo y el punto de depuración). Usa el mismo convenio
+///       que weapon_draw_held: ángulo mundial + espejado con yscale = _facing.
+function weapon_muzzle_x(_def, _x, _y, _angle, _facing) {
+    return _x + lengthdir_x(_def.muzzle_x, _angle)
+              + lengthdir_x(_def.muzzle_y * _facing, _angle - 90);
+}
+function weapon_muzzle_y(_def, _x, _y, _angle, _facing) {
+    return _y + lengthdir_y(_def.muzzle_x, _angle)
+              + lengthdir_y(_def.muzzle_y * _facing, _angle - 90);
+}
+
+
 /// @desc Intenta disparar un arma. Respeta cadencia y munición.
 /// @param {Id.Instance} _weapon Instancia de obj_weapon.
 /// @param {Real} _x Posición de la mano (agarre del arma).
@@ -11,22 +26,29 @@ function weapon_try_fire(_weapon, _x, _y, _angle, _owner) {
     var _def = _weapon.def;
 
     // Las balas nacen en la boca del cañón, no en la mano.
-    var _mx = _x + lengthdir_x(_def.muzzle_x, _angle);
-    var _my = _y + lengthdir_y(_def.muzzle_x, _angle);
+    var _mx = weapon_muzzle_x(_def, _x, _y, _angle, _owner.facing);
+    var _my = weapon_muzzle_y(_def, _x, _y, _angle, _owner.facing);
 
-    // Escopeta: varias balas con dispersión; pistola: una, sin dispersión.
-    repeat (_def.bullets) {
-        var _a = _angle + random_range(-_def.spread * 0.5, _def.spread * 0.5);
-        projectile_spawn(_mx, _my, _a, _def.bullet_speed, _def.damage, _def.bullet_life, _owner);
+    // Si hay pared entre la mano y la boca, el disparo se gasta (munición,
+    // cadencia, retroceso) pero la bala no se crea: nacería dentro del muro.
+    // Se comprueba UNA vez por disparo, no por perdigón.
+    var _blocked = collision_line(_x, _y, _mx, _my, _weapon.tilemap, true, true) != noone;
+
+	
+    var _ammo = ammo_get_def(_def.ammo_id);   // una búsqueda por disparo, no por perdigón
+
+    if (!_blocked) {
+        repeat (_def.bullets) {
+            var _a = _angle + random_range(-_def.spread * 0.5, _def.spread * 0.5);
+            projectile_spawn(_mx, _my, _a, _ammo, _owner, _x, _y);
+        }
     }
-    // El kick se aplica DESPUÉS del disparo: la bala sale con la orientación
-    // actual, y el arma queda ya inclinada para el siguiente tiro.
-    _weapon.kick = clamp(_weapon.kick + _def.kick_up + random_range(-_def.kick_jitter, _def.kick_jitter),-_def.kick_max, _def.kick_max);
+	
+    _weapon.kick = clamp(_weapon.kick + _def.kick_up + random_range(-_def.kick_jitter, _def.kick_jitter), -_def.kick_max, _def.kick_max);
     _weapon.ammo--;
     _weapon.cooldown = _def.fire_delay;
     return true;
 }
-
 /// @desc Ángulo real de puntería de un arma: la dirección base del jugador más
 ///       la inclinación (kick) actual del arma.
 /// @param {Id.Instance} _weapon
@@ -36,4 +58,11 @@ function weapon_try_fire(_weapon, _x, _y, _angle, _owner) {
 function weapon_get_aim_angle(_weapon, _base_angle, _facing) {
     // * _facing: "hacia arriba" gira en sentido opuesto según el lado al que se mira.
     return _base_angle + _weapon.kick * _facing;
+}
+
+/// TEMPORAL: punto rojo en la boca del cañón. Llamar fuera del shader de color.
+function weapon_debug_muzzle(_weapon, _x, _y, _angle, _facing) {
+    var _def = _weapon.def;
+    draw_point_color(weapon_muzzle_x(_def, _x, _y, _angle, _facing),
+                     weapon_muzzle_y(_def, _x, _y, _angle, _facing), c_red);
 }
