@@ -20,7 +20,7 @@ function holdable_find_grabbable(_x, _y) {
 function holdable_draw(_h, _x, _y, _xscale, _yscale, _angle) {
     var _tinted = (_h.color_index >= 0);
     if (_tinted) palette_apply(_h.color_index);
-    draw_sprite_ext(_h.sprite_index, _h.image_index, _x, _y, _xscale, _yscale, _angle, c_white, 1);
+    draw_sprite_ext(_h.sprite_index, _h.image_index, _x, _y, _xscale, _yscale, _angle, c_white, _h.image_alpha);
     if (_tinted) palette_reset();
 }
 

@@ -17,3 +17,6 @@ if (array_length(_spawn_points) > 0) {
         }
     }
 }
+
+// Casquillos: un solo controlador por room de juego (ver scr_fx, CASQUILLOS).
+if (layer_exists("layer_effects")) instance_create_layer(0, 0, "layer_effects", obj_fx_shells);

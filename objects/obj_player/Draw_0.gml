@@ -12,10 +12,18 @@ if (held_item != noone) {
     holdable_draw_held(held_item, player_hand_x(_ang), player_hand_y(_ang), facing, _ang);
 }
 
+// 2b. Destello del clic vacío (solo armas)
+if (held_item != noone && held_item.fires) {
+    weapon_draw_dry_flash(held_item, player_hand_x(_ang), player_hand_y(_ang), _ang, facing);
+}
+
 // 3. Brazo (con color), encima del arma
 palette_apply(_color);
 player_draw_arm(_ang);
 palette_reset();
+
+// 4. Puntitos de munición (accesibilidad), fuera del shader
+player_draw_ammo_pips();
 
 if (DEBUG_TOOLS) player_debug_arm(_ang);          // TEMPORAL
 if (DEBUG_TOOLS) corpse_debug_draw_joint();       // TEMPORAL

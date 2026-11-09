@@ -22,6 +22,7 @@ if (!variable_instance_exists(id, "color_index")) color_index = -1;
 rotates = true;   // false en objetos que no giran (cajas): siempre rectos
 fires   = false;  // true solo en las armas
 kick    = 0;      // inclinación visual en grados; solo las armas la cambian
+recoil_back = 0;  // px que retrocede hacia el hombro (kick lineal); solo las armas lo cambian
 
 // Cómo se dibuja mientras alguien lo sostiene (lo actualiza player_update_held_position).
 // Algunos objetos, como las mitades del cadáver, lo necesitan para ubicar su punto de unión.

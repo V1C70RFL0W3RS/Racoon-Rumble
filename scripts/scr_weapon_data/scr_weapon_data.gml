@@ -26,12 +26,33 @@ function WeaponDef() constructor {
     muzzle_x     = 20;   // distancia desde el agarre hasta la boca del cañón, a lo largo del arma
     muzzle_y     = 0;    // desvío perpendicular de la boca (+ = hacia abajo en el sprite)
     ammo_id      = AMMO_ID.LIGHT;   // tipo de bala (ver scr_ammo_data)
+    snd_empty    = undefined;       // sonido del clic vacío (undefined = sin sonido todavía)
+    // Recarga manual (bombeo/cerrojo): tras CADA disparo, la siguiente pulsación del mismo
+    // botón recarga en vez de disparar.
+    needs_rack   = false;
+    rack_delay   = 15;              // frames que tarda en recargar (no se puede disparar mientras)
+    snd_rack     = undefined;       // sonido de la recarga
+    rack_frame   = -1;              // frame del sprite con la corredera atrás (-1 = sin animación)
+    flash_count  = 6;               // partículas del fogonazo (0 = sin fogonazo)
+    // Casquillo que expulsa (con needs_rack, al recargar; si no, al disparar). shell_len 0 = ninguno.
+    shell_len    = 3;               // largo en px
+    shell_width  = 1;               // grosor en px
+    shell_color  = SHELL_COL_BRASS;
+    heat_per_shot = 0.2;           // calor (0 a 1) que suma cada disparo; más calor = más humo después
     //"kick" = cambio en la orientación del ARMA (distinto de spread).
     automatic     = false; // true = dispara mientras se mantiene el botón
     kick_up       = 0;     // grados que sube el arma en cada disparo
     kick_jitter   = 0;     // temblor aleatorio (±grados) en cada disparo
     kick_max      = 45;    // inclinación máxima permitida, en grados (arriba o abajo)
     kick_recovery = 1;     // grados por frame que el arma vuelve a la posición recta
+    // Bamboleo: en cada disparo se suma una onda (seno), así una ráfaga sube y baja
+    // de forma fluida en vez de solo temblar. 0 = sin bamboleo.
+    kick_wobble       = 0;     // amplitud en grados por disparo
+    kick_wobble_speed = 1;     // cuánto avanza la onda por disparo (radianes): más = oscila más rápido
+    kick_wobble_chaos = 0;     // ± al azar sobre kick_wobble_speed en cada disparo: la onda se vuelve irregular
+    // Kick LINEAL: el arma retrocede hacia el hombro (en px) al disparar y vuelve sola.
+    kick_back          = 0;
+    kick_back_recovery = 0.5;   // px por frame que vuelve a su lugar
 }
 
 /// @desc Construye el catálogo completo. Se llama UNA sola vez al iniciar el juego.
@@ -40,57 +61,86 @@ function weapon_data_init() {
 
     var _pistol = new WeaponDef();
     _pistol.name          = "Pistola";
-    _pistol.sprite        = spr_weapon_gun_1;
+    _pistol.sprite        = spr_weapon_pistol;
+    _pistol.flash_count   = 10;
+    _pistol.heat_per_shot = 0.2;
     _pistol.ammo_max      = 8;
-	_pistol.muzzle_x      = 15;
-	_pistol.muzzle_y      = -5;
+	_pistol.muzzle_x      = 11;
+	_pistol.muzzle_y      = -3;
     _pistol.kick_up       = 4;     
     _pistol.kick_max      = 20;
     _pistol.kick_recovery = 0.5;
+    _pistol.kick_back          = 2;
+    _pistol.kick_back_recovery = 0.5;
     global.weapon_defs[WEAPON_ID.PISTOL] = _pistol;
 
     var _shotgun = new WeaponDef();
     _shotgun.name          = "Escopeta";
-    _shotgun.sprite        = spr_weapon_gun_2;
+    _shotgun.sprite        = spr_weapon_shotgun;
+    _shotgun.flash_count   = 14;
+    _shotgun.heat_per_shot = 0.5;
+    _shotgun.shell_len     = 4;
+    _shotgun.shell_width   = 2;
+    _shotgun.shell_color   = SHELL_COL_RED;
     _shotgun.ammo_max      = 2;
-    _shotgun.fire_delay    = 30;
+    _shotgun.fire_delay    = 15;   // CAMBIO: antes 30; ahora el ritmo lo pone también la recarga
+    _shotgun.needs_rack    = true;
+    _shotgun.rack_delay    = 15;   // disparo (15) + bombeo (15) = mismo ritmo que antes
+    _shotgun.rack_frame    = 1;    // frame 1 de spr_weapon_shotgun: corredera atrás
     _shotgun.recoil        = 4;
     _shotgun.bullets       = 6;
     _shotgun.spread        = 20;
-	_shotgun.muzzle_x      = 48;
-	_shotgun.muzzle_y      = -9.5;
+	_shotgun.muzzle_x      = 18;
+	_shotgun.muzzle_y      = -2;
 	_shotgun.ammo_id = AMMO_ID.PELLET;
     _shotgun.kick_up       = 12; 
     _shotgun.kick_max      = 30;
     _shotgun.kick_recovery = 0.6;
+    _shotgun.kick_back          = 3;
+    _shotgun.kick_back_recovery = 0.4;
     global.weapon_defs[WEAPON_ID.SHOTGUN] = _shotgun;
 
    
     var _magnum = new WeaponDef();
     _magnum.name          = "Magnum";
-    _magnum.sprite        = spr_weapon_gun_1;   // TEMPORAL: sprite prestado de la pistola
+    _magnum.sprite        = spr_weapon_magnum;
+    _magnum.flash_count   = 12;
+    _magnum.heat_per_shot = 0.45;
+    _magnum.shell_len     = 0;   // revólver: guarda los casquillos en el tambor
     _magnum.ammo_max      = 6;
     _magnum.fire_delay    = 25;
-	_magnum.muzzle_x      = 15;
-	_magnum.muzzle_y      = -5;
+	_magnum.muzzle_x      = 17;
+	_magnum.muzzle_y      = -3;
 	_magnum.ammo_id = AMMO_ID.HEAVY;
     _magnum.kick_up       = 18;
     _magnum.kick_max      = 60;
     _magnum.kick_recovery = 0.4;
+    _magnum.kick_back          = 3;
+    _magnum.kick_back_recovery = 0.4;
     global.weapon_defs[WEAPON_ID.MAGNUM] = _magnum;
 
     var _smg = new WeaponDef();
     _smg.name          = "SMG";
-    _smg.sprite        = spr_weapon_gun_1;      // TEMPORAL: sprite prestado de la pistola
+    _smg.sprite        = spr_weapon_smg;
+    _smg.flash_count   = 4;
+    _smg.heat_per_shot = 0.07;
+    _smg.shell_len     = 2;
     _smg.automatic     = true;
     _smg.ammo_max      = 30;
-    _smg.fire_delay    = 4;
+    _smg.fire_delay    = 6;     // CAMBIO: antes 4 (15 balas/s); ahora 10 balas/s
     _smg.recoil        = 1;
-	_smg.muzzle_x      = 15;
-	_smg.muzzle_y      = -5;
-    _smg.kick_jitter   = 4;
-    _smg.kick_max      = 15;
+    _smg.spread        = 8;    // ±4° por bala; el descontrol grande lo da el balanceo del arma
+	_smg.muzzle_x      = 12;
+	_smg.muzzle_y      = -3;
+    _smg.kick_up       = 1;     // sube un poco con la ráfaga
+    _smg.kick_jitter   = 4;     // temblor al azar en cada disparo
+    _smg.kick_wobble       = 10;    // CAMBIO: antes 6; balanceo más amplio
+    _smg.kick_wobble_speed = 0.9;
+    _smg.kick_wobble_chaos = 0.7;   // la onda cambia de ritmo en cada disparo: caótica, no regular
+    _smg.kick_max      = 30;    // CAMBIO: antes 20; deja que el balanceo llegue más lejos
     _smg.kick_recovery = 0.6;
+    _smg.kick_back          = 1;
+    _smg.kick_back_recovery = 0.5;
     global.weapon_defs[WEAPON_ID.SMG] = _smg;
 }
 

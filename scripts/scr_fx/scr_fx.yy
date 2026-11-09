@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_fx",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_fx",
+  "parent":{
+    "name":"Core",
+    "path":"folders/Scripts/Core.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -104,14 +104,56 @@ function player_get_arm_angle() {
     }
     return weapon_get_aim_angle(held_item, player_get_base_aim_angle(), facing);
 }
+/// @desc Distancia hombro → mano. El kick lineal del arma la acorta: la mano y el
+///       arma retroceden juntas hacia el hombro, sin despegarse.
+function player_arm_reach() {
+    var _back = (held_item != noone) ? held_item.recoil_back : 0;
+    return PLAYER_ARM_LENGTH - _back;
+}
+
 /// @desc Posición X de la mano (agarre del arma) para un ángulo de brazo dado.
+///       Dos medidas, igual que la boca del cañón de las armas: PLAYER_ARM_LENGTH a lo
+///       largo del brazo y PLAYER_HAND_OFFSET perpendicular a él. El desvío se
+///       multiplica por facing porque el brazo se dibuja espejado (yscale = facing).
 function player_hand_x(_angle) {
-    return player_shoulder_x() + lengthdir_x(PLAYER_ARM_LENGTH, _angle);
+    return player_shoulder_x() + lengthdir_x(player_arm_reach(), _angle)
+                               + lengthdir_x(PLAYER_HAND_OFFSET * facing, _angle - 90);
 }
 
 /// @desc Posición Y de la mano (agarre del arma) para un ángulo de brazo dado.
 function player_hand_y(_angle) {
-    return player_shoulder_y() + lengthdir_y(PLAYER_ARM_LENGTH, _angle);
+    return player_shoulder_y() + lengthdir_y(player_arm_reach(), _angle)
+                               + lengthdir_y(PLAYER_HAND_OFFSET * facing, _angle - 90);
+}
+
+/// @desc Puntitos de munición sobre la cabeza (opción de accesibilidad). Uno por bala:
+///       claros = quedan, oscuros = gastados; en filas de AMMO_PIPS_PER_ROW, centrados en x.
+///       Es una primitiva: llamar FUERA del shader de color.
+function player_draw_ammo_pips() {
+    if (!global.settings.show_ammo_pips) return;
+    if (ammo_pips_timer <= 0 || held_item == noone || !held_item.fires) return;
+
+    var _max  = held_item.def.ammo_max;
+    var _left = held_item.ammo;
+    var _step = AMMO_PIPS_SIZE + AMMO_PIPS_GAP;
+    var _cols = min(_max, AMMO_PIPS_PER_ROW);
+    var _rows = ceil(_max / AMMO_PIPS_PER_ROW);
+    var _x0   = round(x - (_cols * _step - AMMO_PIPS_GAP) / 2);
+    var _yb   = bbox_top - AMMO_PIPS_MARGIN_Y - AMMO_PIPS_SIZE;   // fila de abajo
+
+    draw_set_alpha(min(1, ammo_pips_timer / AMMO_PIPS_FADE_FRAMES));
+    for (var i = 0; i < _max; i++) {
+        // DECISIÓN: la bala 0 es la primera que se dispara, así los oscuros
+        // "se comen" la fila desde la izquierda.
+        var _px = _x0 + (i mod AMMO_PIPS_PER_ROW) * _step;
+        var _py = _yb - (i div AMMO_PIPS_PER_ROW) * _step;
+        var _col = (i >= _max - _left) ? c_white : c_dkgray;
+        draw_rectangle_color(_px - 1, _py - 1, _px + AMMO_PIPS_SIZE, _py + AMMO_PIPS_SIZE,
+                             c_black, c_black, c_black, c_black, false);   // contorno
+        draw_rectangle_color(_px, _py, _px + AMMO_PIPS_SIZE - 1, _py + AMMO_PIPS_SIZE - 1,
+                             _col, _col, _col, _col, false);
+    }
+    draw_set_alpha(1);
 }
 
 /// @desc Dibuja el brazo en el hombro con el ángulo dado. Debe llamarse con el shader
@@ -198,14 +240,14 @@ function player_shoulder_y() {
 ///       PLAYER_SHOULDER_X/Y y PLAYER_ARM_LENGTH. Es una primitiva: se llama FUERA
 ///       del shader (después de palette_reset).
 function player_debug_arm(_angle) {
-    draw_point_color(shoulder_x, shoulder_y, c_red);
-    draw_point_color(player_hand_x(_angle), player_hand_y(_angle), c_yellow);
+    debug_draw_dot(shoulder_x, shoulder_y, c_red);
+    debug_draw_dot(player_hand_x(_angle), player_hand_y(_angle), c_yellow);
 }
 
 /// @desc TEMPORAL: punto rojo en el hombro para afinar PLAYER_SHOULDER_X/Y.
 ///       Es una primitiva: se llama FUERA del shader (después de palette_reset).
 function player_debug_shoulder() {
-    draw_point_color(shoulder_x, shoulder_y, c_red);
+    debug_draw_dot(shoulder_x, shoulder_y, c_red);
 }
 
 /// @desc TEMPORAL: afinador del hombro en vivo. Solo lo maneja el jugador 1.

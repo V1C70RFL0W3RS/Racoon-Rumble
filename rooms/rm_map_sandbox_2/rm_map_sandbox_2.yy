@@ -71,7 +71,7 @@
           1,44,-5,-2147483648,1,8,-58,9,1,3,-5,-2147483648,4,61,-2147483648,-2147483648,44,-5,-2147483648,1,44,
           -4,-2147483648,2,48,8,-59,9,1,3,-4,-2147483648,1,55,-8,-2147483648,1,44,-3,-2147483648,-2,48,1,8,-60,
           9,1,3,-3,-2147483648,1,55,-11,-2147483648,-3,48,1,8,-61,9,-18,2,-901,9,
-        ],"TileDataFormat":1,},"tilesetId":{"name":"tls_6","path":"tilesets/tls_6/tls_6.yy",},"userdefinedDepth":false,"visible":false,"x":0,"y":0,},
+        ],"TileDataFormat":1,},"tilesetId":{"name":"tls_6","path":"tilesets/tls_6/tls_6.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
     {"$GMRTileLayer":"","%Name":"layer_collision","depth":500,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":true,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":false,"layers":[],"name":"layer_collision","properties":[],"resourceType":"GMRTileLayer","resourceVersion":"2.0","tiles":{"SerialiseHeight":45,"SerialiseWidth":80,"TileCompressedData":[
           1,1,-25,-2147483648,1,9,-32,-2147483648,-11,1,-10,-2147483648,1,1,-16,-2147483648,-2,0,-5,-2147483648,
           3,0,-2147483648,9,-32,-2147483648,-11,1,-10,-2147483648,1,1,-16,-2147483648,-3,0,1,-2147483648,-4,0,
@@ -103,7 +103,7 @@
           -10,-2147483648,-70,1,-10,-2147483648,-70,1,-10,-2147483648,-70,1,-10,-2147483648,-70,1,-10,-2147483648,
           -70,1,-10,-2147483648,-70,1,-10,-2147483648,-70,1,-10,-2147483648,-70,1,-10,-2147483648,-70,1,-10,-2147483648,
           -70,1,-90,-2147483648,
-        ],"TileDataFormat":1,},"tilesetId":{"name":"tls_ground","path":"tilesets/tls_ground/tls_ground.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
+        ],"TileDataFormat":1,},"tilesetId":{"name":"tls_ground","path":"tilesets/tls_ground/tls_ground.yy",},"userdefinedDepth":false,"visible":false,"x":0,"y":0,},
     {"$GMRBackgroundLayer":"","%Name":"layer_background","animationFPS":30.0,"animationSpeedType":0,"colour":4294967295,"depth":700,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"hspeed":0.0,"htiled":false,"inheritLayerDepth":true,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":false,"layers":[],"name":"layer_background","properties":[],"resourceType":"GMRBackgroundLayer","resourceVersion":"2.0","spriteId":{"name":"spr_bg_22","path":"sprites/spr_bg_22/spr_bg_22.yy",},"stretch":true,"userdefinedAnimFPS":false,"userdefinedDepth":false,"visible":true,"vspeed":0.0,"vtiled":false,"x":0,"y":0,},
   ],
   "name":"rm_map_sandbox_2",

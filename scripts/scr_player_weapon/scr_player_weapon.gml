@@ -16,10 +16,12 @@ function player_grab_item() {
 
     _w.holder = id;
     held_item = _w;
+    if (_w.fires) ammo_pips_timer = AMMO_PIPS_SHOW_FRAMES;   // al agarrar, se ve cuánta tiene
 }
 
-/// @desc Suelta el arma. Mirando arriba la lanza hacia arriba; en movimiento la
-///       lanza hacia adelante; quieto, la lanza suavemente.
+/// @desc Suelta el arma. Agachado o deslizando la deja caer de la mano; mirando
+///       arriba la lanza hacia arriba; en movimiento la lanza hacia adelante; quieto,
+///       la lanza suavemente.
 /// @param {Struct} _in Input del frame actual.
 function player_release_item(_in) {
     // DECISIÓN: el ángulo y la mano se leen ANTES de soltar. Sin arma,
@@ -32,7 +34,11 @@ function player_release_item(_in) {
     var _w = held_item;
     held_item = noone;
 
-    if (_in.up_held) {
+    if (crouching || sliding) {
+        // Agachado o deslizando, el arma cae de la mano: sin impulso ni giro.
+        // DECISIÓN: va antes que "arriba" para que agachado nunca la lance.
+        holdable_eject(_w, _hx, _hy, facing, 0, 0, 0);
+    } else if (_in.up_held) {
         // CAMBIO: hacia arriba, sin velocidad horizontal (biblia 4.4.4). Antes pasaba hsp.
         holdable_eject(_w, _hx, _hy, facing, 0, -HOLDABLE_THROW_UP_SPEED, -HOLDABLE_THROW_SPIN * facing);
     } else if (abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
@@ -54,6 +60,7 @@ function player_try_fire(_in) {
     // Automática: alcanza con mantener el botón. Semiautomática: un clic por disparo.
     var _wants_fire = held_item.def.automatic ? _in.fire_held : _in.fire_pressed;
     if (!_wants_fire) return;
+    ammo_pips_timer = AMMO_PIPS_SHOW_FRAMES;   // también con el clic vacío
 
     // aim_up ya se actualizó en este Step (antes de llamar a esta función).
     var _base = player_get_base_aim_angle();  // dirección base, sin kick

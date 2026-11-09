@@ -28,8 +28,8 @@ function player_update_crouch(_in) {
         return;
     }
 
-    // "Abajo" corriendo inicia el slide. Una vez iniciado NO termina al frenar:
-    // la pose de slide se mantiene hasta soltar "abajo".
+    // "Abajo" corriendo inicia el slide. En el piso NO termina al frenar: la pose de
+    // slide se mantiene hasta soltar "abajo" (o hasta saltar quieto, ver player_apply_jump).
     if (!sliding && abs(hsp) > PLAYER_SLIDE_MIN_SPEED) sliding = true;
 
     crouching = !sliding;
@@ -40,7 +40,14 @@ function player_update_crouch(_in) {
 /// DECISIÓN: sin esta comprobación, levantarse bajo un techo bajo dejaría la máscara
 /// de pie incrustada en el tilemap y el jugador quedaría atrapado.
 function player_can_stand() {
-    mask_index = spr_player_run;   // todas las poses de pie comparten máscara
+    return player_fits_mask(spr_player_run);   // todas las poses de pie comparten máscara
+}
+
+/// @desc ¿Cabe la máscara de _spr en la posición actual, sin chocar con el tilemap?
+///       Se prueba sin cambiar de sprite.
+/// @param {Asset.GMSprite} _spr Sprite cuya máscara se prueba.
+function player_fits_mask(_spr) {
+    mask_index = _spr;
     var _blocked = place_meeting(x, y, tilemap);
     mask_index = -1;               // -1 = volver a usar la máscara del sprite actual
     return !_blocked;
@@ -92,9 +99,18 @@ function player_apply_jump(_in) {
         jump_buffer = 0;
         jumping = true;
         _jumped = true;
-        // Saltar agachado te levanta. Saltar deslizando conserva la pose de slide hasta
-        // aterrizar (y hsp no se toca, así que conserva toda la velocidad).
-        crouching = false;
+        // Saltar agachado te levanta. Saltar deslizando EN MOVIMIENTO conserva la pose de
+        // slide hasta aterrizar (y hsp no se toca, así que conserva toda la velocidad).
+        // Saltar desde un slide ya detenido cambia a la pose de agachado.
+        // DECISIÓN: se decide UNA vez, al despegar. Si se revisara en el aire, la fricción
+        // frenaría el slide-jump a mitad del vuelo y cambiaría de pose sin motivo.
+        // La máscara de agachado cabe: arriba ya se comprobó que cabe la de pie.
+        if (sliding && abs(hsp) < PLAYER_SLIDE_STOP_SPEED) {
+            sliding = false;
+            crouching = true;
+        } else {
+            crouching = false;
+        }
         state = PLAYER_STATE.JUMP;
     }
 

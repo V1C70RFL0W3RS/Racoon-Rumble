@@ -34,9 +34,6 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":null,
-  "spriteMaskId":{
-    "name":"spr_obj_weapon",
-    "path":"sprites/spr_obj_weapon/spr_obj_weapon.yy",
-  },
+  "spriteMaskId":null,
   "visible":true,
 }

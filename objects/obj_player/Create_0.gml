@@ -17,11 +17,8 @@ hovering = false;   // true mientras aletea
 crouching = false;   // agachado y casi quieto
 sliding   = false;   // deslizando (agachado con inercia)
 arm_raise = 0;   // 0 = brazo en su ángulo normal, 1 = levantado del todo porque el arma toca una pared
+ammo_pips_timer = 0;   // frames que les quedan a los puntitos de munición (accesibilidad)
 
-// TEMPORAL: afinador del hombro (ver player_debug_tune_shoulder).
-shoulder_tune = false;
-tune_pose     = 0;
-tune_frame    = 0;
 // TEMPORAL: afinador del hombro (ver player_debug_tune_shoulder).
 shoulder_tune = false;
 tune_pose     = 0;

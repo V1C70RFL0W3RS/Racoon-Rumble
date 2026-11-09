@@ -14,7 +14,13 @@ if (_p != noone) {
     exit;
 }
 
-if (_hit_wall) { instance_destroy(); exit; }
+if (_hit_wall) {
+    var _dir = point_direction(0, 0, hsp, vsp);
+    var _c = projectile_wall_contact(x, y, _dir, tilemap);
+    fx_bullet_sparks(_c[0], _c[1], _dir);
+    instance_destroy();
+    exit;
+}
 
 prev_x = x;
 prev_y = y;

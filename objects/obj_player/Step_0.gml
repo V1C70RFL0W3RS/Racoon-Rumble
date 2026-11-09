@@ -8,6 +8,7 @@ player_update_item(_in);
 aim_up = _in.up_held;
 player_update_arm_raise();   
 player_try_fire(_in);
+if (ammo_pips_timer > 0) ammo_pips_timer--;
 
 player_update_movement(_in);
 player_update_state(id);

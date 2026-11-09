@@ -1,3 +1,5 @@
+settings_init();      // PRIMERO: ajustes del jugador (otros sistemas pueden leerlos)
+fx_init();            // tipos de partículas (humo, etc.)
 weapon_data_init();
 ammo_data_init();
 player_palette_init();

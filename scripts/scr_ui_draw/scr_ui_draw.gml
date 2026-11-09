@@ -43,3 +43,19 @@ function ui_draw_body_list(_lines, _y_start_frac, _line_height = 24, _color = c_
     draw_set_color(c_white);
     draw_set_halign(fa_left);
 }
+
+
+// =============================================================================
+// DEPURACIÓN
+// =============================================================================
+
+/// @desc Dibuja un punto de depuración visible en el mundo: un cuadro de
+///       (2 * DEBUG_DOT_HALF + 1) px. Un solo píxel casi no se ve a 320x180.
+///       Es una primitiva: llamar FUERA del shader de color.
+/// @param {Real}     _x
+/// @param {Real}     _y
+/// @param {Constant.Color} _col
+function debug_draw_dot(_x, _y, _col) {
+    draw_rectangle_color(_x - DEBUG_DOT_HALF, _y - DEBUG_DOT_HALF,
+                         _x + DEBUG_DOT_HALF, _y + DEBUG_DOT_HALF, _col, _col, _col, _col, false);
+}

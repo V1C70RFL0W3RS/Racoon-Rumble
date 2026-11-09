@@ -19,13 +19,13 @@ function get_player_input(player_index) {
     var _device = global.match.players_joined[player_index];
 
     if (_device.device_type == "keyboard") {
-        // Teclado: A/D mover, Espacio saltar, E agarrar/tirar, W/S arriba/abajo, clic izquierdo disparar.
+        // Teclado (sin mouse): A/D mover, W/S arriba/abajo, Espacio saltar, C agarrar/tirar, V disparar.
         _input.move_x       = keyboard_check(ord("D")) - keyboard_check(ord("A"));
         _input.jump_pressed = keyboard_check_pressed(vk_space);
         _input.jump_held    = keyboard_check(vk_space);
-        _input.fire_pressed = mouse_check_button_pressed(mb_left);
-        _input.fire_held    = mouse_check_button(mb_left);
-        _input.grab_pressed = keyboard_check_pressed(ord("E"));
+        _input.fire_pressed = keyboard_check_pressed(ord("V"));
+        _input.fire_held    = keyboard_check(ord("V"));
+        _input.grab_pressed = keyboard_check_pressed(ord("C"));
         _input.up_held      = keyboard_check(ord("W"));
         _input.down_held    = keyboard_check(ord("S"));
 
