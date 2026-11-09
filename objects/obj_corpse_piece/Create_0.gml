@@ -8,3 +8,6 @@ drives_angle = true;   // el ángulo lo decide la pareja (corpse_pair_update), n
 air_friction_mult = CORPSE_AIR_FRICTION_MULT;
 wall_bounce       = CORPSE_BOUNCE;
 floor_bounce      = CORPSE_BOUNCE;
+shootable         = true;                 // las balas lo empujan y se detienen en él
+impact_mult       = CORPSE_IMPACT_MULT;
+block_chance      = CORPSE_BLOCK_CHANCE;  // escudo imperfecto: parte de las balas lo atraviesa

@@ -19,6 +19,11 @@ function AmmoDef() constructor {
     trail_length = 24;        // largo de la estela en px (como Duck Game: la bala se ve como una línea)
     trail_color  = c_white;   // color de la punta; la cola se desvanece a transparente
     trail_width  = 1;         // grosor de la estela en px
+    trail_invert = true;      // true = color contrario al fondo (se ve sobre blanco y negro);
+                              // false = trail_color normal (para balas de color, p. ej. un láser)
+    impact = 3;   // px/frame que empuja a lo que golpea (cadáver; a futuro cajas)
+    pierce = 0;   // cuántos objetos 'shootable' atraviesa antes de detenerse (0 = se detiene
+                  // en el primero; un sniper futuro, 1 o más). A los jugadores nunca los atraviesa.
 }
 
 /// @desc Construye el catálogo de munición. Se llama UNA vez al iniciar el juego.
@@ -32,6 +37,7 @@ function ammo_data_init() {
     _light.range = 400;
     _light.trail_length = 24;
     _light.trail_width  = 2;
+    _light.impact = 3;
     global.ammo_defs[AMMO_ID.LIGHT] = _light;
 
     var _heavy = new AmmoDef();
@@ -40,6 +46,7 @@ function ammo_data_init() {
     _heavy.range = 500;
     _heavy.trail_length = 40;   // la Magnum deja la estela más larga
     _heavy.trail_width  = 3;
+    _heavy.impact = 6;          // la Magnum empuja el doble
     global.ammo_defs[AMMO_ID.HEAVY] = _heavy;
 
     var _pellet = new AmmoDef();
@@ -48,6 +55,7 @@ function ammo_data_init() {
     _pellet.range = 150;     // escopeta: corto alcance
     _pellet.trail_length = 12;
     _pellet.trail_width  = 1;   // muchos perdigones finos
+    _pellet.impact = 1.5;       // poco cada uno, pero salen varios juntos
     global.ammo_defs[AMMO_ID.PELLET] = _pellet;
 
     // La vida en frames sale siempre del alcance y la velocidad.

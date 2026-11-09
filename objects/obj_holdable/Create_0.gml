@@ -24,6 +24,12 @@ fires   = false;  // true solo en las armas
 kick    = 0;      // inclinación visual en grados; solo las armas la cambian
 recoil_back = 0;  // px que retrocede hacia el hombro (kick lineal); solo las armas lo cambian
 
+// Balas. shootable = las balas lo detectan (y se detienen en él, salvo munición con pierce).
+// impact_mult = qué tanto lo mueve el impacto (1 = normal; menor = más pesado; 0 = no se mueve).
+shootable   = false;
+impact_mult = 1;
+block_chance = 1;   // probabilidad (0 a 1) de DETENER la bala; si no, la deja pasar (igual la empuja)
+
 // Cómo se dibuja mientras alguien lo sostiene (lo actualiza player_update_held_position).
 // Algunos objetos, como las mitades del cadáver, lo necesitan para ubicar su punto de unión.
 held_angle  = 0;

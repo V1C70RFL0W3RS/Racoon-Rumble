@@ -24,14 +24,17 @@ function corpse_joint_get(_frame) {
 
 /// @desc Crea las dos piezas de un cadáver, ensambladas por su punto de unión. ÚNICO
 ///       lugar donde se crean piezas, igual que projectile_spawn con las balas.
-function corpse_spawn(_x, _y, _facing, _hsp, _vsp, _color_index) {
+/// @param {Real} [_hit_dir] Dirección del golpe que lo mató (grados).
+/// @param {Real} [_hit_power] Empujón de ese golpe (0 = ninguno). Se suma a la inercia, con la
+///        misma fórmula que un disparo a un cadáver ya caído (impact × CORPSE_IMPACT_MULT).
+function corpse_spawn(_x, _y, _facing, _hsp, _vsp, _color_index, _hit_dir = 0, _hit_power = 0) {
     // Frame 2 = parte superior muerta (sin pupila); frame 1 = parte inferior.
     var _frames = [2, 1];
     var _pieces = [noone, noone];
 
     // DECISIÓN: la velocidad se calcula UNA vez y la comparten las dos piezas.
-    var _h = _hsp * CORPSE_INERTIA;
-    var _v = _vsp + CORPSE_POP_SPEED;
+    var _h = _hsp * CORPSE_INERTIA + lengthdir_x(_hit_power * CORPSE_IMPACT_MULT, _hit_dir);
+    var _v = _vsp + CORPSE_POP_SPEED + lengthdir_y(_hit_power * CORPSE_IMPACT_MULT, _hit_dir);
 
     for (var _i = 0; _i < 2; _i++) {
         // Cada pieza nace con SU punto de unión en el mismo lugar del mundo.

@@ -101,3 +101,19 @@ function holdable_depenetrate(_h) {
         }
     }
 }
+
+/// @desc Un holdable 'shootable' recibe un disparo: lo empuja en la dirección de la bala.
+///       ÚNICO punto de entrada de una bala a un objeto (como player_take_hit con jugadores):
+///       aquí se sumará el daño de las cajas que se rompen cuando existan.
+///       Los topes HOLDABLE_MAX_* los aplica el Step del holdable, no hace falta repetirlos.
+/// @param {Id.Instance} _h Holdable golpeado.
+/// @param {Real} _dir Dirección de la bala (grados).
+/// @param {Real} _power Empujón de la munición (AmmoDef.impact), en px/frame.
+function holdable_take_shot(_h, _dir, _power) {
+    with (_h) {
+        if (holder != noone) return;   // en una mano: lo controla quien lo lleva
+        var _k = _power * impact_mult;
+        hsp += lengthdir_x(_k, _dir);
+        vsp += lengthdir_y(_k, _dir);
+    }
+}

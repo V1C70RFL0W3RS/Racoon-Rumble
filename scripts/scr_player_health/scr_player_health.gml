@@ -1,11 +1,13 @@
 /// @desc Aplica daño a un jugador. Al llegar a 0 de vida, muere.
 /// @param {Id.Instance} _player Instancia de obj_player.
 /// @param {Real} _damage
-function player_take_hit(_player, _damage) {
+/// @param {Real} [_dir] Dirección del golpe en grados (la de la bala). Opcional.
+/// @param {Real} [_power] Empujón del golpe (AmmoDef.impact). 0 = sin empujón.
+function player_take_hit(_player, _damage, _dir = 0, _power = 0) {
     with (_player) {
         if (state == PLAYER_STATE.DEAD) return; // no se puede matar dos veces
         hp -= _damage;
-        if (hp <= 0) player_die();
+        if (hp <= 0) player_die(_dir, _power);
     }
 }
 
@@ -13,7 +15,9 @@ function player_take_hit(_player, _damage) {
 ///       Suelta el arma, deja las dos piezas del cadáver y se oculta. No hay
 ///       respawn: vuelve a aparecer en la ronda siguiente, cuando el manager
 ///       recrea a los jugadores.
-function player_die() {
+/// @param {Real} [_dir] Dirección del golpe que lo mató (grados).
+/// @param {Real} [_power] Empujón de ese golpe. 0 (por defecto) = muerte sin golpe (caída).
+function player_die(_dir = 0, _power = 0) {
     // DECISIÓN: la mano se calcula ANTES de soltar el arma. Sin arma, el ángulo
     // del brazo pasa a ser el de "colgando" y el arma saltaría de lugar.
     var _ang = player_get_arm_angle();
@@ -40,6 +44,6 @@ function player_die() {
     // Si murió cayendo fuera del mapa no se crean piezas: no habría nada que ver
     // y caerían para siempre.
     if (y < room_height) {
-        corpse_spawn(x, y, facing, _hsp, _vsp, player_get_color_index(player_index));
+        corpse_spawn(x, y, facing, _hsp, _vsp, player_get_color_index(player_index), _dir, _power);
     }
 }

@@ -51,7 +51,7 @@ function weapon_try_fire(_weapon, _x, _y, _angle, _owner) {
         fx_muzzle_flash(_mx, _my, _angle, _def.flash_count);   // UNO por disparo, no por perdigón
         repeat (_def.bullets) {
             var _a = _angle + random_range(-_def.spread * 0.5, _def.spread * 0.5);
-            projectile_spawn(_mx, _my, _a, _ammo, _owner, _x, _y);
+            projectile_spawn(_mx, _my, _a, _ammo, _owner, _x, _y, _def.impact_mult);
         }
     }
 	

@@ -26,6 +26,8 @@ function WeaponDef() constructor {
     muzzle_x     = 20;   // distancia desde el agarre hasta la boca del cañón, a lo largo del arma
     muzzle_y     = 0;    // desvío perpendicular de la boca (+ = hacia abajo en el sprite)
     ammo_id      = AMMO_ID.LIGHT;   // tipo de bala (ver scr_ammo_data)
+    impact_mult  = 1;               // × AmmoDef.impact: ajusta el empujón por arma sin cambiar la munición
+                                    // (la SMG comparte LIGHT con la pistola pero dispara mucho más seguido)
     snd_empty    = undefined;       // sonido del clic vacío (undefined = sin sonido todavía)
     // Recarga manual (bombeo/cerrojo): tras CADA disparo, la siguiente pulsación del mismo
     // botón recarga en vez de disparar.
@@ -141,6 +143,7 @@ function weapon_data_init() {
     _smg.kick_recovery = 0.6;
     _smg.kick_back          = 1;
     _smg.kick_back_recovery = 0.5;
+    _smg.impact_mult        = 0.4;  // 3 × 0.4 = 1.2 por bala: la ráfaga empuja, pero no lanza el cadáver
     global.weapon_defs[WEAPON_ID.SMG] = _smg;
 }
 

@@ -152,6 +152,8 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro CORPSE_AIR_FRICTION_MULT  0.3    // biblia 4.4.5 E: 70 % menos resistencia al aire
 #macro CORPSE_BOUNCE             0.6    // rebota con el 60 % de su velocidad
 #macro CORPSE_DRAW_SLACK         2      // px que puede estirarse el dibujo antes de recortarlo
+#macro CORPSE_IMPACT_MULT        1      // cuánto lo mueve una bala (× AmmoDef.impact)
+#macro CORPSE_BLOCK_CHANCE       0.5    // probabilidad de que CADA pieza detenga una bala (las dos juntas: 75 %)
 
 // =============================================================================
 // PARTIDA (rondas, lobby, intermission)
