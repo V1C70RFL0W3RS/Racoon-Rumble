@@ -89,6 +89,16 @@ function player_apply_jump(_in) {
     var _jumped = false;
     var _can_jump = (jump_buffer > 0 && coyote_timer > 0);
 
+    // Abajo + saltar parado sobre una plataforma (caja): en vez de saltar, se baja a través de ella.
+    if (_can_jump && _in.down_held && standing_on != noone) {
+        platform_drop_timer = PLAYER_PLATFORM_DROP_FRAMES;
+        standing_on  = noone;
+        is_grounded  = false;
+        coyote_timer = 0;
+        jump_buffer  = 0;
+        _can_jump    = false;
+    }
+
     // No se salta con el techo encima estando bajo: el sprite de pie quedaría incrustado.
     if (_can_jump && (crouching || sliding) && !player_can_stand()) _can_jump = false;
 
@@ -133,6 +143,7 @@ function player_move_and_collide() {
 
     if (vsp < 0) player_corner_correct();
 
+    var _y0 = y;   // antes de bajar: para saber si los pies CRUZARON la tapa de una plataforma
     var _col_v = move_and_collide(0, vsp, tilemap);
     if (array_length(_col_v) > 0) {
         is_grounded = (vsp > 0);
@@ -140,6 +151,25 @@ function player_move_and_collide() {
     } else {
         is_grounded = false;
     }
+
+    standing_on = noone;
+    if (!is_grounded && vsp >= 0) player_land_on_platform(_y0);
+}
+
+/// @desc Si este frame los pies cruzaron la tapa de una plataforma (caja), el jugador se para
+///       sobre ella (ver PLATAFORMAS en scr_holdable). Solo se llama al bajar.
+/// @param {Real} _y0 y del jugador antes del movimiento vertical de este frame.
+function player_land_on_platform(_y0) {
+    if (platform_drop_timer > 0) { platform_drop_timer--; return; }
+
+    var _foot = mask_bottom_offset();
+    var _p = platform_find_below(bbox_left, bbox_right, _y0 + _foot, y + _foot, id);
+    if (_p == noone) return;
+
+    y = _p.bbox_top - 1 - _foot;
+    vsp = 0;
+    is_grounded = true;
+    standing_on = _p;
 }
 
 /// @description Si al subir la cabeza roza apenas la esquina de un tile, desplaza al jugador

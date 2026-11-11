@@ -61,32 +61,31 @@ function player_get_slide_aim_angle() {
     return (facing == 1) ? PLAYER_SLIDE_AIM_DEG : 180 - PLAYER_SLIDE_AIM_DEG;
 }
 
-/// @desc Actualiza arm_raise una vez por Step. Con un arma en la mano, el brazo sube si
-///       el jugador aletea, o si desliza y el arma está por tocar una pared. Se llama desde
-///       el Step, no desde getters, porque hace una colisión y los getters se llaman varias
-///       veces por frame.
+/// @desc Actualiza arm_raise una vez por Step. Con algo en la mano, el brazo sube DEL TODO
+///       (apunta arriba) al aletear o si lo sostenido toca una pared al frente (de pie,
+///       agachado o deslizando). Se llama desde el Step, no desde getters, porque hace una
+///       colisión y los getters se llaman varias veces por frame.
 function player_update_arm_raise() {
     var _target = 0;
 
-    if (held_item != noone) {
-        if (hovering) {
-            _target = 1;
-        } else if (sliding) {
-            // DECISIÓN: se prueba SIEMPRE con el ángulo de slide sin levantar. Si se probara
-            // con el brazo ya levantado, éste "liberaría" la pared, volvería a bajar y parpadearía.
-            var _ang = player_get_slide_aim_angle();
-            var _muzzle = held_item.fires ? held_item.def.muzzle_x : 0;
-            var _len = PLAYER_ARM_LENGTH + _muzzle + PLAYER_ARM_WALL_MARGIN;
-            var _sx  = player_shoulder_x();
-            var _sy  = player_shoulder_y();
-
-            var _blocked = (collision_line(_sx, _sy, _sx + lengthdir_x(_len, _ang),
-                                           _sy + lengthdir_y(_len, _ang), tilemap, false, true) != noone);
-            if (_blocked) _target = 1;
-        }
+    if (held_item != noone && !aim_up) {   // apuntando arriba ya está en 90: no hay nada que probar
+        if (hovering || player_arm_touches_wall()) _target = 1;
     }
 
     arm_raise = approach(arm_raise, _target, PLAYER_ARM_RAISE_SPEED);
+}
+
+/// @desc ¿Lo sostenido toca una pared con el brazo en su ángulo normal (sin levantar)?
+///       DECISIÓN: se prueba SIEMPRE con el ángulo sin levantar. Si se probara con el brazo ya
+///       levantado, éste "liberaría" la pared, volvería a bajar y parpadearía.
+function player_arm_touches_wall() {
+    var _ang    = sliding ? player_get_slide_aim_angle() : ((facing == 1) ? 0 : 180);
+    var _muzzle = held_item.fires ? held_item.def.muzzle_x : 0;
+    var _len    = PLAYER_ARM_LENGTH + _muzzle + PLAYER_ARM_WALL_MARGIN;
+    var _sx     = player_shoulder_x();
+    var _sy     = player_shoulder_y();
+    return collision_line(_sx, _sy, _sx + lengthdir_x(_len, _ang), _sy + lengthdir_y(_len, _ang),
+                          tilemap, false, true) != noone;
 }
 /// @desc Ángulo mundial del brazo, y del arma que sostiene: dirección base + kick.
 ///       Sin arma, el brazo cuelga (270), salvo aleteando (arriba) o deslizando (su propia pose).

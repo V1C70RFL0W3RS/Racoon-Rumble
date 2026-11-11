@@ -9,7 +9,7 @@
 // =============================================================================
 // JUGADORES
 // =============================================================================
-#macro MAX_PLAYERS 4
+#macro MAX_PLAYERS 8
 #macro PLAYER_MAX_HP 1                  // 1 = un golpe mata (pilar de diseño)
 enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 
@@ -35,6 +35,10 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro PLAYER_COYOTE_FRAMES       7
 #macro PLAYER_JUMP_BUFFER_FRAMES  4
 #macro PLAYER_CORNER_CORRECT_PX   4     // NO es de Duck Game: ayuda extra, se puede quitar
+#macro PLAYER_PLATFORM_DROP_FRAMES 4
+// --- Gorro: base respecto del HOMBRO (que ya sigue el rebote de cada frame) ---
+#macro PLAYER_HAT_DX  1      // + = hacia donde mira
+#macro PLAYER_HAT_DY -10     // - = más arriba    // frames que ignora las plataformas (cajas) tras bajarse con abajo + saltar
 
 // --- Animación ---
 #macro PLAYER_RUN_ANIM_RATE     0.08    // frames de animación avanzados por cada píxel/step de velocidad
@@ -83,6 +87,8 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro HOLDABLE_THROW_SPEED       7.5     // velocidad horizontal ABSOLUTA al lanzar corriendo
 #macro HOLDABLE_THROW_LIFT       -2       // impulso vertical al lanzar
 #macro HOLDABLE_THROW_UP_SPEED    5       // velocidad al lanzar hacia arriba
+#macro HOLDABLE_THROW_DIAG_SPEED  7       // velocidad al lanzar en diagonal (arriba + corriendo), a 45°
+#macro HOLDABLE_CRUSH_BOUNCE      2.5     // saltito hacia arriba al caerle en la cabeza a un jugador (px/frame)
 #macro HOLDABLE_THROW_SPIN        14      // grados por frame que gira al lanzarlo
 
 // --- Soltar quieto ---
@@ -104,9 +110,6 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 // --- Arma vacía: desaparece al quedar quieta (como Duck Game) ---
 #macro WEAPON_EMPTY_DESPAWN_DELAY 60   // frames quieta en el piso, vacía y sin dueño, antes de empezar a desvanecerse
 #macro WEAPON_DESPAWN_FADE_FRAMES 20   // frames del desvanecido; al terminar sale humo y se destruye
-#macro FX_SMOKE_COUNT 8                 // partículas por bocanada de humo (fx_smoke_puff)
-#macro FX_SPARK_COUNT 6                 // chispas por bala que choca con una pared
-#macro FX_SPARK_SPREAD 55               // ± grados del abanico de chispas (alrededor del rebote)
 // --- Humo del cañón (calor del arma) ---
 #macro WEAPON_HEAT_DECAY   0.004  // calor (0 a 1) que pierde el arma por frame
 #macro WEAPON_SMOKE_DELAY  10     // frames sin disparar antes de que empiece a humear
@@ -114,7 +117,6 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro WEAPON_SMOKE_RATE   0.35   // probabilidad por frame de soltar humo con el calor al máximo
 
 // --- Casquillos (obj_fx_shells) ---
-#macro SHELL_MAX         60     // tope en pantalla; al pasarlo se borra el más viejo
 #macro SHELL_LIFE        600    // frames que dura cada casquillo (10 s a 60 fps)
 #macro SHELL_FADE        60     // últimos frames en los que se desvanece
 #macro SHELL_GRAVITY     0.2
@@ -124,7 +126,6 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro SHELL_FRICTION    0.6    // velocidad horizontal que conserva en cada rebote contra el piso
 #macro SHELL_COL_BRASS   make_colour_rgb(214, 170, 60)   // latón (pistola, SMG)
 #macro SHELL_COL_RED     make_colour_rgb(178, 40, 40)    // cartucho de escopeta
-#macro FX_MUZZLE_SPREAD 25              // ± grados del cono del fogonazo
 #macro PROJECTILE_CONTACT_SEARCH 12     // px máximos que se busca el punto de impacto delante de la bala (mayor que media máscara)
 
 // --- Puntitos de munición (accesibilidad, ver global.settings.show_ammo_pips) ---
@@ -156,6 +157,65 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro CORPSE_BLOCK_CHANCE       0.5    // probabilidad de que CADA pieza detenga una bala (las dos juntas: 75 %)
 
 // =============================================================================
+// CAJA (obj_crate)
+// =============================================================================
+#macro CRATE_HP           4      // vida: escopeta de cerca = 1 tiro, pistola/SMG = 4, Magnum = 2
+#macro CRATE_IMPACT_MULT  0.5    // pesa más que un cadáver: las balas la mueven la mitad
+#macro CRATE_WALL_BOUNCE  0.3
+#macro CRATE_AIR_FRICTION_MULT 0.35   // fricción en el aire × esto (1 = como un arma; cadáver 0.3). Menor = vuela más lejos
+#macro CRATE_GRIP_X      -6      // la mano la toma de un costado: la caja queda adelante
+#macro CRATE_GRIP_Y       0
+#macro CRATE_CRUSH_SPEED  3      // cayendo a esta velocidad (px/frame) o más sobre una cabeza, mata
+
+// =============================================================================
+// EFECTOS (partículas, ver scr_fx)
+// =============================================================================
+#macro FX_SMOKE_COUNT 8                 // partículas por bocanada de humo (fx_smoke_puff)
+#macro FX_SPARK_COUNT 6                 // chispas por bala que choca con una pared
+#macro FX_SPARK_SPREAD 55               // ± grados del abanico de chispas (alrededor del rebote)
+#macro FX_MUZZLE_SPREAD 25              // ± grados del cono del fogonazo
+
+#macro FX_DEBRIS_MAX 160               // tope de restos (casquillos + pelo) en pantalla; al pasarlo se borra el más viejo
+
+// --- Pelo (al morir y al dispararle al cadáver). Son restos: chocan con el mapa ---
+#macro FX_FUR_DEATH_COUNT  14     // mechones al morir de un disparo
+#macro FX_FUR_DEATH_SPREAD 70     // ± grados alrededor de la dirección de la bala
+#macro FX_FUR_HIT_COUNT    4      // mechones por bala que golpea una pieza del cadáver
+#macro FX_FUR_HIT_SPREAD   50
+#macro FX_FUR_BODY_Y      -8      // altura desde los pies de donde sale el pelo al morir (mitad del cuerpo)
+#macro FX_FUR_LEN          3      // largo de cada mechón (px)
+#macro FX_FUR_SPEED_MIN    1      // velocidad inicial (px/frame)
+#macro FX_FUR_SPEED_MAX    3
+#macro FX_FUR_DRAG         0.1    // fracción de velocidad que pierde por frame (el aire)
+#macro FX_FUR_GRAVITY      0.05   // con el drag da una caída terminal de ~0.45 px/frame
+#macro FX_FUR_SWAY         0.4    // vaivén al caer (px/frame); ~4 px de lado a lado
+#macro FX_FUR_SWAY_RATE    6      // grados de fase por frame: un vaivén completo cada ~60 frames
+#macro FX_FUR_SPIN         8      // ± grados por frame que gira en el aire
+#macro FX_FUR_LIFE_MIN     150    // frames que dura cada mechón (incluye el tiempo en el piso)
+#macro FX_FUR_LIFE_MAX     240
+#macro FX_FUR_FADE         40     // últimos frames en que se desvanece
+
+// --- Astillas (cajas). Son restos con física de casquillo ---
+#macro FX_SPLINTER_HIT_COUNT   2      // astillas por bala que golpea una caja
+#macro FX_SPLINTER_HIT_SPREAD  50
+#macro FX_SPLINTER_BREAK_COUNT 14     // astillas al romperse
+#macro FX_SPLINTER_SPEED_MIN   1
+#macro FX_SPLINTER_SPEED_MAX   3.5
+#macro FX_SPLINTER_LIFT        1      // impulso extra hacia arriba, para que salten
+#macro FX_SPLINTER_LIFE        300    // frames (5 s)
+#macro FX_WOOD_COL_LIGHT  make_colour_rgb(198, 134, 72)   // mismos tonos que spr_crate
+#macro FX_WOOD_COL_DARK   make_colour_rgb(110, 62, 30)
+
+// =============================================================================
+// AUDIO (ver scr_audio)
+// =============================================================================
+#macro SFX_MIN_GAP_MS      30    // el MISMO sonido no se repite antes de esto (evita encimar copias)
+#macro SFX_MAX_VOICES      4     // copias simultáneas del mismo sonido; al pasarlo se corta la más vieja
+#macro SFX_GAIN_VAR        0.12  // variación de volumen al azar (0.12 ≈ hasta -1 dB): menos fatiga
+#macro SFX_PRIORITY_NORMAL 1
+#macro SFX_PRIORITY_HIGH   10    // sonidos que nunca deben cortarse (muerte)
+
+// =============================================================================
 // PARTIDA (rondas, lobby, intermission)
 // =============================================================================
 #macro LOBBY_JOIN_KEY            vk_space
@@ -164,12 +224,31 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro MATCH_INTERMISSION_FRAMES 300    // 5 s a 60 FPS, mostrando puntajes
 #macro MAP_NAME_PREFIX           "rm_map_" // toda room con este prefijo entra al pool de mapas
 
-// TEMPORAL: valores por defecto hasta que exista la UI de ajustes del lobby (Fase E).
+// Valores con que arranca la PC del host (global.match.lobby_settings).
 #macro MATCH_DEFAULT_SCORE_TO_WIN     3
 #macro MATCH_DEFAULT_ROUNDS_PER_BLOCK 3
 
 // TEMPORAL: segundo teclado de testeo, para probar multijugador sin mando físico.
 #macro LOBBY_JOIN_KEY_TEST vk_shift
+
+// --- Lobby: PCs y ajustes del host ---
+#macro LOBBY_HOST_INDEX   0      // en local, el host es el primero que se unió
+#macro LOBBY_SCORE_MIN    1
+#macro LOBBY_SCORE_MAX    20
+#macro LOBBY_ROUNDS_MIN   1
+#macro LOBBY_ROUNDS_MAX   10
+#macro LOBBY_MAX_PLAYERS_MIN  1
+#macro LOBBY_MAX_PLAYERS_MAX  8
+#macro LOBBY_MAX_PLAYERS_DEFAULT 4
+
+// --- Objetos que se usan (scr_interact) y su menú (scr_menu_options) ---
+#macro INTERACT_RADIUS    24     // distancia máxima (desde el pecho) para usar una PC
+#macro INTERACT_ANYONE   -2      // use_slot: cualquiera puede usarlo
+#macro INTERACT_HOST     -1      // use_slot: solo el host
+#macro MENU_REPEAT_DELAY  18     // frames manteniendo una dirección antes de que empiece a repetir
+#macro MENU_REPEAT_RATE   6      // frames entre repeticiones
+#macro MENU_COLOR         make_colour_rgb(60, 230, 90)   // verde de pantalla (como spr_lobby_pc)
+#macro MENU_BG_ALPHA      0.85
 
 // =============================================================================
 // CÁMARA
@@ -178,6 +257,7 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro CAMERA_VIEW_W         320
 #macro CAMERA_VIEW_H         180
 #macro CAMERA_ASPECT         (CAMERA_VIEW_W / CAMERA_VIEW_H)   // 16:9: el ancho siempre sale de la altura
+#macro CAMERA_FIXED_ROOMS    [rm_lobby]   // rooms con cámara fija que encuadra la room entera
 
 // --- Zoom y bordes (biblia 11.6) ---
 #macro CAMERA_MIN_HEIGHT     60      // alto mínimo de la vista = zoom máximo (biblia: minSize)

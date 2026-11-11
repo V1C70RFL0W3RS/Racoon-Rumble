@@ -4,6 +4,11 @@ if (state == PLAYER_STATE.DEAD) exit;
 if (variable_struct_exists(global.match, "state") && global.match.state == MATCH_STATE.COUNTDOWN) exit;
 
 var _in = get_player_input(player_index);
+if (using != noone) {
+    // Usando una PC: los controles manejan su menú y el cuerpo se queda quieto (la gravedad sigue).
+    interact_handle_input(using, _in);
+    _in = input_empty();
+}
 player_update_item(_in);
 aim_up = _in.up_held;
 player_update_arm_raise();   

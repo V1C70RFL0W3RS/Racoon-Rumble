@@ -3,8 +3,14 @@
 function player_update_item(_in) {
     if (!_in.grab_pressed) return;
 
-    if (held_item == noone) player_grab_item();
-    else                      player_release_item(_in);
+    if (held_item == noone) {
+        // Con las manos vacías, usar algo cercano (PC del lobby) tiene prioridad sobre agarrar.
+        var _it = interact_find(id);
+        if (_it != noone) interact_begin(_it, id);
+        else              player_grab_item();
+    } else {
+        player_release_item(_in);
+    }
 }
 
 
@@ -16,12 +22,13 @@ function player_grab_item() {
 
     _w.holder = id;
     held_item = _w;
+    audio_play_sfx(snd_pickup);
     if (_w.fires) ammo_pips_timer = AMMO_PIPS_SHOW_FRAMES;   // al agarrar, se ve cuánta tiene
 }
 
 /// @desc Suelta el arma. Agachado o deslizando la deja caer de la mano; mirando
-///       arriba la lanza hacia arriba; en movimiento la lanza hacia adelante; quieto,
-///       la lanza suavemente.
+///       arriba la lanza hacia arriba (en diagonal si se mueve); en movimiento la lanza
+///       hacia adelante; quieto, la lanza suavemente.
 /// @param {Struct} _in Input del frame actual.
 function player_release_item(_in) {
     // DECISIÓN: el ángulo y la mano se leen ANTES de soltar. Sin arma,
@@ -38,8 +45,13 @@ function player_release_item(_in) {
         // Agachado o deslizando, el arma cae de la mano: sin impulso ni giro.
         // DECISIÓN: va antes que "arriba" para que agachado nunca la lance.
         holdable_eject(_w, _hx, _hy, facing, 0, 0, 0);
+    } else if (_in.up_held && abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
+        // Mirando arriba EN MOVIMIENTO: en diagonal (45°) hacia donde corre.
+        var _dir = (hsp > 0) ? 45 : 135;
+        holdable_eject(_w, _hx, _hy, facing, lengthdir_x(HOLDABLE_THROW_DIAG_SPEED, _dir),
+                     lengthdir_y(HOLDABLE_THROW_DIAG_SPEED, _dir), -HOLDABLE_THROW_SPIN * sign(hsp));
     } else if (_in.up_held) {
-        // CAMBIO: hacia arriba, sin velocidad horizontal (biblia 4.4.4). Antes pasaba hsp.
+        // Mirando arriba QUIETO: recto hacia arriba, sin velocidad horizontal (biblia 4.4.4).
         holdable_eject(_w, _hx, _hy, facing, 0, -HOLDABLE_THROW_UP_SPEED, -HOLDABLE_THROW_SPIN * facing);
     } else if (abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
         // CAMBIO: velocidad ABSOLUTA, ya no se le suma hsp. Con la gravedad nueva volaría demasiado lejos.

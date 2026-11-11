@@ -3,6 +3,10 @@
 /// DECISIÓN: partículas en vez de un objeto por humito: no son instancias, no corren
 /// Step ni colisiones, y cientos cuestan casi nada (importante en celular).
 
+/// Efecto que suelta un holdable cuando lo golpea una bala (bandera hit_fx de obj_holdable).
+/// Agregar un tipo = un valor aquí + un case en fx_holdable_hit (y en fx_holdable_break si se rompe).
+enum HIT_FX { NONE, FUR, WOOD }
+
 /// @desc Crea los TIPOS de partícula (son globales y duran todo el juego).
 ///       Se llama UNA vez en el Create de obj_game_manager.
 function fx_init() {
@@ -97,51 +101,154 @@ function fx_barrel_smoke(_x, _y) {
     part_particles_create(fx_get_system(), _x, _y, global.fx_barrel_smoke, 1);
 }
 
+/// @desc Efecto (visual y sonido) de un holdable al recibir una bala, según su bandera hit_fx.
+///       Lo llama holdable_take_shot. Las cajas agregarán aquí sus astillas.
+/// @param {Id.Instance} _h Holdable golpeado.
+/// @param {Real} _dir Dirección de la bala (grados).
+function fx_holdable_hit(_h, _dir) {
+    switch (_h.hit_fx) {
+        case HIT_FX.FUR:
+            fx_fur(_h.x, _h.y, _dir, FX_FUR_HIT_SPREAD, _h.color_index, FX_FUR_HIT_COUNT);
+            break;
+        case HIT_FX.WOOD:
+            fx_splinters(_h.x, _h.y, _dir, FX_SPLINTER_HIT_SPREAD, FX_SPLINTER_HIT_COUNT);
+            audio_play_sfx(snd_wood_hit, 0.1);
+            break;
+    }
+}
+
+/// @desc Efecto de un holdable al ROMPERSE, según su bandera hit_fx. Lo llama holdable_break.
+function fx_holdable_break(_h, _dir) {
+    switch (_h.hit_fx) {
+        case HIT_FX.WOOD:
+            fx_splinters(_h.x, _h.y, _dir, 180, FX_SPLINTER_BREAK_COUNT);   // en todas direcciones
+            fx_smoke_puff(_h.x, _h.y);
+            audio_play_sfx(snd_wood_break);
+            break;
+    }
+}
+
 // =============================================================================
-// CASQUILLOS
-// DECISIÓN: no son instancias. Viven en el arreglo `shells` de UN obj_fx_shells por
-// room (lo crea obj_game_manager en Room Start). Chocan con tilemap_get_at_pixel
-// (un punto, muy barato) y los que ya reposan no calculan nada: solo se dibujan.
+// RESTOS (casquillos, pelo, y a futuro astillas)
+// DECISIÓN: no son partículas, porque las partículas de GameMaker NO chocan con el mapa
+// (el pelo atravesaba pisos y paredes). Tampoco son instancias: viven como structs en el
+// arreglo `debris` de UN obj_fx_shells por room (lo crea obj_game_manager en Room Start).
+// Chocan con tilemap_get_at_pixel (un punto, muy barato) y los que reposan no calculan nada.
+// Cada resto lleva SUS parámetros de física: un solo update y un solo draw para todos.
 // =============================================================================
 
+/// @desc Crea un resto con la física de un casquillo. Quien lo crea cambia los campos
+///       que necesite (ver fx_fur) y lo entrega a fx_debris_add.
+function fx_debris_make(_x, _y, _hsp, _vsp, _len, _wid, _col) {
+    return {
+        x: _x, y: _y, hsp: _hsp, vsp: _vsp,
+        angle: random(360),
+        spin:  random_range(-25, 25),
+        rest:  false,
+        life:  SHELL_LIFE,
+        fade:  SHELL_FADE,        // últimos frames en que se desvanece
+        len: _len, wid: _wid, col: _col,
+        // Física (valores de casquillo):
+        grav:       SHELL_GRAVITY,
+        max_fall:   SHELL_MAX_FALL,
+        drag:       0,            // fracción de velocidad que pierde por frame en el aire
+        bounce:     SHELL_BOUNCE,
+        friction:   SHELL_FRICTION,
+        rest_speed: SHELL_REST_SPEED,  // cayendo más lento que esto, se queda en el piso
+        sway:       0,            // vaivén horizontal (px/frame); 0 = no se mece
+        sway_rate:  0,            // grados de fase por frame
+        phase:      random(360)
+    };
+}
+
+/// @desc Agrega un resto al controlador de la room. Sin obj_fx_shells (menú) no hace nada.
+function fx_debris_add(_d) {
+    with (obj_fx_shells) {
+        if (array_length(debris) >= FX_DEBRIS_MAX) array_delete(debris, 0, 1);   // el más viejo
+        array_push(debris, _d);
+    }
+}
+
 /// @desc Expulsa un casquillo desde la mano: hacia arriba y atrás, girando.
-///       Si la room no tiene obj_fx_shells (menú, lobby sin efectos) no hace nada.
 /// @param {Real} _x
 /// @param {Real} _y
 /// @param {Real} _facing 1 = mira a la derecha (el casquillo sale hacia la izquierda).
 /// @param {Struct.WeaponDef} _def De aquí salen largo, grosor y color.
 function fx_shell_spawn(_x, _y, _facing, _def) {
     if (_def.shell_len <= 0) return;
-    with (obj_fx_shells) {
-        if (array_length(shells) >= SHELL_MAX) array_delete(shells, 0, 1);   // el más viejo
-        array_push(shells, {
-            x: _x, y: _y - 2,
-            hsp: -_facing * random_range(0.8, 2),
-            vsp: -random_range(1.5, 3),
-            angle: random(360),
-            spin:  random_range(-25, 25),
-            rest:  false,
-            life:  SHELL_LIFE,
-            len:   _def.shell_len,
-            wid:   _def.shell_width,
-            col:   _def.shell_color
-        });
+    fx_debris_add(fx_debris_make(_x, _y - 2,
+        -_facing * random_range(0.8, 2), -random_range(1.5, 3),
+        _def.shell_len, _def.shell_width, _def.shell_color));
+}
+
+/// @desc Mechones de pelo del color de un jugador, en un abanico alrededor de _dir. Salen
+///       disparados, el aire los frena, caen despacio meciéndose y se quedan en el piso.
+/// @param {Real} _x
+/// @param {Real} _y
+/// @param {Real} _dir Hacia dónde salen (la dirección de la bala).
+/// @param {Real} _spread ± grados del abanico (180 = en todas direcciones).
+/// @param {Real} _color_index Índice de paleta del jugador.
+/// @param {Real} _count Cantidad de mechones.
+function fx_fur(_x, _y, _dir, _spread, _color_index, _count) {
+    var _c = global.player_palette[max(0, _color_index) mod array_length(global.player_palette)];
+    repeat (_count) {
+        var _a = _dir + random_range(-_spread, _spread);
+        var _s = random_range(FX_FUR_SPEED_MIN, FX_FUR_SPEED_MAX);
+        var _d = fx_debris_make(_x, _y, lengthdir_x(_s, _a), lengthdir_y(_s, _a),
+                                FX_FUR_LEN, 1, merge_colour(_c.mid, _c.light, random(1)));
+        _d.spin       = random_range(-FX_FUR_SPIN, FX_FUR_SPIN);
+        _d.life       = irandom_range(FX_FUR_LIFE_MIN, FX_FUR_LIFE_MAX);
+        _d.fade       = FX_FUR_FADE;
+        _d.grav       = FX_FUR_GRAVITY;
+        _d.drag       = FX_FUR_DRAG;
+        _d.bounce     = 0;
+        _d.rest_speed = infinity;   // no rebota: se posa al primer contacto
+        _d.sway       = FX_FUR_SWAY;
+        _d.sway_rate  = random_range(FX_FUR_SWAY_RATE * 0.7, FX_FUR_SWAY_RATE * 1.3);
+        fx_debris_add(_d);
     }
 }
 
-/// @desc Físicas de todos los casquillos. Llamar desde el Step de obj_fx_shells.
-function fx_shells_update() {
-    for (var i = array_length(shells) - 1; i >= 0; i--) {   // al revés: se puede borrar
-        var _s = shells[i];
+/// @desc Astillas de madera: restos con física de casquillo (rebotan y se quedan en el piso).
+/// @param {Real} _dir Hacia dónde salen (la dirección de la bala).
+/// @param {Real} _spread ± grados del abanico (180 = en todas direcciones).
+function fx_splinters(_x, _y, _dir, _spread, _count) {
+    repeat (_count) {
+        var _a = _dir + random_range(-_spread, _spread);
+        var _s = random_range(FX_SPLINTER_SPEED_MIN, FX_SPLINTER_SPEED_MAX);
+        var _d = fx_debris_make(_x, _y, lengthdir_x(_s, _a), lengthdir_y(_s, _a) - FX_SPLINTER_LIFT,
+                                irandom_range(2, 4), 1, choose(FX_WOOD_COL_LIGHT, FX_WOOD_COL_DARK));
+        _d.life = FX_SPLINTER_LIFE;
+        fx_debris_add(_d);
+    }
+}
+
+/// @desc Físicas de todos los restos. Llamar desde el Step de obj_fx_shells.
+function fx_debris_update() {
+    for (var i = array_length(debris) - 1; i >= 0; i--) {   // al revés: se puede borrar
+        var _s = debris[i];
         _s.life--;
-        if (_s.life <= 0) { array_delete(shells, i, 1); continue; }
+        if (_s.life <= 0) { array_delete(debris, i, 1); continue; }
         if (_s.rest) continue;   // en reposo no cuesta nada
 
-        _s.vsp = min(_s.vsp + SHELL_GRAVITY, SHELL_MAX_FALL);
+        // Gravedad, y después el aire. Con drag > 0 hay velocidad terminal (cae parejo).
+        _s.vsp += _s.grav;
+        if (_s.drag > 0) {
+            _s.hsp *= 1 - _s.drag;
+            _s.vsp *= 1 - _s.drag;
+        }
+        _s.vsp = min(_s.vsp, _s.max_fall);
 
-        var _nx = _s.x + _s.hsp;
+        // El vaivén se suma al movimiento horizontal, así también choca con las paredes.
+        var _sx = 0;
+        if (_s.sway != 0) {
+            _sx = _s.sway * dsin(_s.phase);
+            _s.phase += _s.sway_rate;
+        }
+
+        var _nx = _s.x + _s.hsp + _sx;
         if (tilemap_get_at_pixel(tilemap, _nx, _s.y) != 0) {
-            _s.hsp  = -_s.hsp * SHELL_BOUNCE;
+            _s.hsp  = -_s.hsp * _s.bounce;
             _s.spin = -_s.spin;
         } else {
             _s.x = _nx;
@@ -149,9 +256,9 @@ function fx_shells_update() {
 
         var _ny = _s.y + _s.vsp;
         if (tilemap_get_at_pixel(tilemap, _s.x, _ny) != 0) {
-            if (_s.vsp > SHELL_REST_SPEED) {
-                _s.vsp   = -_s.vsp * SHELL_BOUNCE;
-                _s.hsp  *= SHELL_FRICTION;
+            if (_s.vsp > _s.rest_speed) {
+                _s.vsp   = -_s.vsp * _s.bounce;
+                _s.hsp  *= _s.friction;
                 _s.spin *= 0.5;
             } else if (_s.vsp > 0) {
                 // Se queda acostado: el ángulo se lleva a 0 o 180, el más cercano.
@@ -170,13 +277,13 @@ function fx_shells_update() {
     }
 }
 
-/// @desc Dibuja todos los casquillos. Llamar desde el Draw de obj_fx_shells.
-function fx_shells_draw() {
-    for (var i = 0; i < array_length(shells); i++) {
-        var _s  = shells[i];
+/// @desc Dibuja todos los restos (una línea cada uno). Llamar desde el Draw de obj_fx_shells.
+function fx_debris_draw() {
+    for (var i = 0; i < array_length(debris); i++) {
+        var _s  = debris[i];
         var _hx = lengthdir_x(_s.len / 2, _s.angle);
         var _hy = lengthdir_y(_s.len / 2, _s.angle);
-        draw_set_alpha(min(1, _s.life / SHELL_FADE));
+        draw_set_alpha(min(1, _s.life / _s.fade));
         draw_line_width_colour(_s.x - _hx, _s.y - _hy, _s.x + _hx, _s.y + _hy, _s.wid, _s.col, _s.col);
     }
     draw_set_alpha(1);

@@ -8,5 +8,6 @@
 function settings_init() {
     global.settings = {
         show_ammo_pips: true,   // accesibilidad: puntitos de munición sobre el jugador
+        sfx_volume:     1,      // volumen de los efectos de sonido (0 a 1)
     };
 }

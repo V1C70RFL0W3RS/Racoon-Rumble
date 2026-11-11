@@ -15,6 +15,8 @@ function AmmoDef() constructor {
     speed  = 20;    // píxeles por frame
     range  = 300;   // alcance en PÍXELES (lo que importa al diseñar)
     damage = 1;     // 1 = muerte de un golpe (pilar de diseño de Duck Game)
+    object_damage = 1;   // vida que le quita a un objeto destructible (cajas). Separado de
+                         // `damage` porque a los jugadores toda bala los mata igual.
     life   = 0;     // frames de vida: se DERIVA de range/speed, no tocar a mano
     trail_length = 24;        // largo de la estela en px (como Duck Game: la bala se ve como una línea)
     trail_color  = c_white;   // color de la punta; la cola se desvanece a transparente
@@ -47,6 +49,7 @@ function ammo_data_init() {
     _heavy.trail_length = 40;   // la Magnum deja la estela más larga
     _heavy.trail_width  = 3;
     _heavy.impact = 6;          // la Magnum empuja el doble
+    _heavy.object_damage = 3;   // rompe una caja en 2 disparos
     global.ammo_defs[AMMO_ID.HEAVY] = _heavy;
 
     var _pellet = new AmmoDef();

@@ -18,6 +18,7 @@ function palette_entry(_name, _mid) {
     var _light = merge_color(_mid, c_white, 0.4);
     return {
         name: _name,
+        mid: _mid, light: _light,   // colores crudos (pelo, ver fx_fur); los r/g/b de abajo son para el shader
         mr: color_get_red(_mid)     / 255, mg: color_get_green(_mid)     / 255, mb: color_get_blue(_mid)     / 255,
         lr: color_get_red(_light)   / 255, lg: color_get_green(_light)   / 255, lb: color_get_blue(_light)   / 255
     };
@@ -37,17 +38,20 @@ function palette_reset() {
 /// @desc Devuelve el primer color de la paleta que ningún jugador unido usa todavía.
 ///       Si hay más jugadores que colores, devuelve el 0 (se repite).
 function palette_first_free_index() {
-    var _joined = global.match.players_joined;
-    var _count  = array_length(global.player_palette);
-
-    for (var c = 0; c < _count; c++) {
-        var _taken = false;
-        for (var i = 0; i < array_length(_joined); i++) {
-            if (_joined[i].color_index == c) { _taken = true; break; }
-        }
-        if (!_taken) return c;
+    for (var c = 0; c < array_length(global.player_palette); c++) {
+        if (!palette_is_taken(c)) return c;
     }
     return 0;
+}
+
+/// @desc ¿Algún jugador unido usa ya este color? _except = player_index que no se cuenta
+///       (el propio jugador, al cambiar de color).
+function palette_is_taken(_color, _except = -1) {
+    var _joined = global.match.players_joined;
+    for (var i = 0; i < array_length(_joined); i++) {
+        if (i != _except && _joined[i].color_index == _color) return true;
+    }
+    return false;
 }
 
 /// @desc Índice de paleta del jugador dado. El color vive en global.match (no en

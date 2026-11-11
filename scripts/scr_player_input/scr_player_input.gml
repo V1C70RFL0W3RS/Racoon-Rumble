@@ -1,9 +1,7 @@
-/// @description scr_player_input — devuelve un struct con el input de ESTE frame para un jugador dado.
-/// Único lugar que conoce teclado y mando: el resto del juego solo lee este struct.
-/// @param {real} player_index
-
-function get_player_input(player_index) {
-    var _input = {
+/// @desc Input "sin nada presionado". Base de get_player_input, y lo que recibe el cuerpo de
+///       un jugador mientras usa una PC (se queda quieto).
+function input_empty() {
+    return {
         move_x:       0,
         jump_pressed: false,
         jump_held:    false,
@@ -13,6 +11,14 @@ function get_player_input(player_index) {
         up_held:      false,
         down_held:    false
     };
+}
+
+/// @description scr_player_input — devuelve un struct con el input de ESTE frame para un jugador dado.
+/// Único lugar que conoce teclado y mando: el resto del juego solo lee este struct.
+/// @param {real} player_index
+
+function get_player_input(player_index) {
+    var _input = input_empty();
 
     // El dispositivo no se deduce de player_index: se consulta en la lista
     // armada durante el lobby (ver scr_lobby).

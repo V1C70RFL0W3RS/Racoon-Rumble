@@ -16,12 +16,15 @@ while (_t != noone) {
         instance_destroy();
         exit;
     }
-    holdable_take_shot(_t, _dir, impact);   // lo empuja, la detenga o no
+    // DECISIÓN: block_chance se lee ANTES del disparo, porque el disparo puede romper el
+    // objeto (caja) y después ya no existiría.
+    var _block = _t.block_chance;
+    holdable_take_shot(_t, _dir, impact, object_damage);   // empuja, efecto y daño
     // ¿Sigue la bala? Primero la munición (pierce: sniper futuro, siempre atraviesa);
     // si no, la suerte del objeto (block_chance: el cadáver es un escudo imperfecto).
     if (pierce > 0) {
         pierce--;
-    } else if (random(1) < _t.block_chance) {
+    } else if (random(1) < _block) {
         instance_destroy();
         exit;
     }
@@ -34,6 +37,7 @@ while (_t != noone) {
 if (_hit_wall) {
     var _c = projectile_wall_contact(x, y, _dir, tilemap);
     fx_bullet_sparks(_c[0], _c[1], _dir);
+    audio_play_sfx(snd_bullet_wall, 0.15);   // más variación: se oye muchas veces
     instance_destroy();
     exit;
 }

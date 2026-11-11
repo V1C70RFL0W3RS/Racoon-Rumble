@@ -8,3 +8,4 @@ view_h = CAMERA_VIEW_H;
 center_x = 0;      // centro de la cámara en el mundo, SIN redondear (se redondea solo al aplicarlo)
 center_y = 0;
 snap_next = true;  // fuerza que el próximo Step ubique la cámara sin interpolar
+fixed = false;     // true = cámara fija que encuadra la room entera (lobby); ver CAMERA_FIXED_ROOMS

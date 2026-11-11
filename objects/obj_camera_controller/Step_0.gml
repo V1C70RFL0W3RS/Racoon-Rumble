@@ -1,3 +1,5 @@
+if (fixed) exit;   // cámara fija (lobby): la ubicó Room Start y no se mueve
+
 // --- Caja de los jugadores VIVOS (cuerpo entero, no solo los pies). Los muertos no cuentan.
 var _left = infinity, _right = -infinity, _top = infinity, _bottom = -infinity, _n = 0;
 

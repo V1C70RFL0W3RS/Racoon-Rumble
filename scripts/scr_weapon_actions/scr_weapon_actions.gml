@@ -54,6 +54,7 @@ function weapon_try_fire(_weapon, _x, _y, _angle, _owner) {
             projectile_spawn(_mx, _my, _a, _ammo, _owner, _x, _y, _def.impact_mult);
         }
     }
+    audio_play_sfx(_def.snd_fire);   // suena aunque la pared se coma la bala: el disparo sí ocurrió
 	
     var _wobble = sin(_weapon.wobble_phase) * _def.kick_wobble;
     _weapon.wobble_phase += _def.kick_wobble_speed + random_range(-_def.kick_wobble_chaos, _def.kick_wobble_chaos);

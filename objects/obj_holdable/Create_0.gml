@@ -29,6 +29,19 @@ recoil_back = 0;  // px que retrocede hacia el hombro (kick lineal); solo las ar
 shootable   = false;
 impact_mult = 1;
 block_chance = 1;   // probabilidad (0 a 1) de DETENER la bala; si no, la deja pasar (igual la empuja)
+hit_fx = HIT_FX.NONE;   // efecto visual al recibir una bala (ver fx_holdable_hit)
+shield_when_held = false;   // true = las balas lo golpean aunque esté en una mano (escudo)
+
+// Vida. -1 = indestructible (armas, cadáver). Si llega a 0 se rompe (holdable_break).
+max_hp = -1;
+hp     = -1;
+
+// true = los jugadores pueden pararse encima cuando está suelto (plataforma de un solo
+// sentido: se atraviesa de lado y desde abajo). Ver player_land_on_platform.
+platform = false;
+
+// > 0 = si cae sobre la cabeza de un jugador a esta velocidad (px/frame) o más, lo mata.
+crush_speed = 0;
 
 // Cómo se dibuja mientras alguien lo sostiene (lo actualiza player_update_held_position).
 // Algunos objetos, como las mitades del cadáver, lo necesitan para ubicar su punto de unión.

@@ -102,18 +102,112 @@ function holdable_depenetrate(_h) {
     }
 }
 
-/// @desc Un holdable 'shootable' recibe un disparo: lo empuja en la dirección de la bala.
-///       ÚNICO punto de entrada de una bala a un objeto (como player_take_hit con jugadores):
-///       aquí se sumará el daño de las cajas que se rompen cuando existan.
-///       Los topes HOLDABLE_MAX_* los aplica el Step del holdable, no hace falta repetirlos.
+/// @desc Un holdable 'shootable' recibe un disparo. ÚNICO punto de entrada de una bala a un
+///       objeto (como player_take_hit con jugadores): empuja, muestra el efecto y quita vida.
+///       Suelto, lo empuja en la dirección de la bala; en una mano (escudo) no lo mueve, porque
+///       lo controla quien lo lleva. Los topes HOLDABLE_MAX_* los aplica el Step del holdable.
 /// @param {Id.Instance} _h Holdable golpeado.
 /// @param {Real} _dir Dirección de la bala (grados).
 /// @param {Real} _power Empujón de la munición (AmmoDef.impact), en px/frame.
-function holdable_take_shot(_h, _dir, _power) {
+/// @param {Real} [_damage] Vida que le quita (AmmoDef.object_damage). Solo afecta a destructibles.
+function holdable_take_shot(_h, _dir, _power, _damage = 0) {
     with (_h) {
-        if (holder != noone) return;   // en una mano: lo controla quien lo lleva
-        var _k = _power * impact_mult;
-        hsp += lengthdir_x(_k, _dir);
-        vsp += lengthdir_y(_k, _dir);
+        if (holder == noone) {
+            var _k = _power * impact_mult;
+            hsp += lengthdir_x(_k, _dir);
+            vsp += lengthdir_y(_k, _dir);
+        }
+        fx_holdable_hit(id, _dir);   // pelo, astillas... según la bandera hit_fx
+        if (hp >= 0) holdable_damage(id, _damage, _dir);   // -1 = indestructible
     }
+}
+
+/// @desc Quita vida a un holdable destructible. Si su sprite tiene varios frames, muestra el
+///       daño (frame 0 = entero, el último = casi roto). Al llegar a 0, se rompe.
+/// @param {Id.Instance} _h
+/// @param {Real} _damage
+/// @param {Real} _dir Dirección del golpe (hacia dónde salen los restos al romperse).
+function holdable_damage(_h, _damage, _dir) {
+    with (_h) {
+        hp = max(0, hp - _damage);
+        if (hp <= 0) { holdable_break(id, _dir); return; }
+        var _n = sprite_get_number(sprite_index);
+        if (_n > 1) image_index = min(_n - 1, floor((1 - hp / max_hp) * _n));
+    }
+}
+
+/// @desc Rompe un holdable: efecto de rotura según hit_fx y lo destruye.
+function holdable_break(_h, _dir) {
+    fx_holdable_break(_h, _dir);
+    holdable_destroy(_h);
+}
+
+/// @desc ÚNICO lugar donde se destruye un holdable que podría estar en una mano: primero se lo
+///       quita a quien lo sostiene, para que no quede apuntando a una instancia que ya no existe.
+function holdable_destroy(_h) {
+    if (_h.holder != noone && instance_exists(_h.holder)) _h.holder.held_item = noone;
+    instance_destroy(_h);
+}
+
+
+// =============================================================================
+// PLATAFORMAS (holdables con `platform`, p. ej. cajas)
+// De un solo sentido: solo se aterriza en ellas al BAJAR, así que de lado o desde abajo
+// se atraviesan. Las usan el jugador (player_land_on_platform) y los holdables (su Step),
+// así las cajas se apilan y un arma puede quedar encima de una caja.
+// DECISIÓN: no son parte del tilemap porque se mueven, se agarran y se rompen.
+// =============================================================================
+
+/// @desc Distancia del origen al borde INFERIOR de la máscara, ejecutado como la instancia.
+///       Se lee del sprite y no de bbox_bottom, que se redondea y haría temblar a quien
+///       está parado sobre una plataforma. Respeta image_yscale (un arma acostada, espejada).
+function mask_bottom_offset() {
+    var _m = (mask_index >= 0) ? mask_index : sprite_index;
+    var _o = sprite_get_yoffset(_m);
+    return (image_yscale >= 0) ? (sprite_get_bbox_bottom(_m) - _o) * image_yscale
+                               : (sprite_get_bbox_top(_m)    - _o) * image_yscale;
+}
+
+/// @desc Plataforma cuya tapa cruzó un borde inferior este frame: estaba ENCIMA (_b0) y ahora
+///       está a su altura o más abajo (_b1). Si cruzó varias, la más alta.
+/// @param {Real} _l bbox_left de quien cae.
+/// @param {Real} _r bbox_right de quien cae.
+/// @param {Real} _b0 Borde inferior ANTES de moverse este frame.
+/// @param {Real} _b1 Borde inferior DESPUÉS.
+/// @param {Id.Instance} _self Quien cae (una caja no aterriza sobre sí misma).
+/// @returns {Id.Instance} La plataforma, o noone. Pararse encima = borde inferior en su bbox_top - 1.
+function platform_find_below(_l, _r, _b0, _b1, _self) {
+    var _best = noone;
+    var _best_top = infinity;
+    with (obj_holdable) {
+        if (!platform || holder != noone || id == _self) continue;   // descarte barato primero
+        if (_r < bbox_left || _l > bbox_right) continue;             // no está debajo
+        var _surf = bbox_top - 1;                                    // donde queda el borde inferior
+        if (_b0 <= _surf + 0.01 && _b1 >= _surf && bbox_top < _best_top) {
+            _best_top = bbox_top;
+            _best = id;
+        }
+    }
+    return _best;
+}
+
+/// @desc Si un holdable que aplasta (crush_speed > 0) cae sobre la CABEZA de un jugador lo bastante
+///       rápido, lo mata. "Por arriba" = su borde inferior venía por encima de la cabeza del
+///       jugador al empezar el frame; así una caja que cae al lado, o que lo atraviesa de
+///       costado, no mata. Ejecutar como el holdable.
+/// @param {Real} _fall Velocidad vertical con que se movió este frame (antes de aterrizar).
+/// @param {Real} _b0 Su borde inferior antes de moverse.
+function holdable_try_crush(_fall, _b0) {
+    if (crush_speed <= 0 || _fall < crush_speed) return;
+    var _h = id;
+    var _crushed = false;
+    with (obj_player) {
+        if (state == PLAYER_STATE.DEAD) continue;
+        if (_b0 > bbox_top) continue;                   // ya estaba a la altura del cuerpo: no es la cabeza
+        if (!place_meeting(x, y, _h)) continue;
+        player_take_hit(id, PLAYER_MAX_HP, 270, _fall);   // el cadáver sale hacia abajo
+        _crushed = true;
+    }
+    // Rebota en la cabeza: un saltito hacia arriba (sigue cayendo después con la gravedad).
+    if (_crushed) vsp = -HOLDABLE_CRUSH_BOUNCE;
 }

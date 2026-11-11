@@ -30,6 +30,8 @@ function player_die(_dir = 0, _power = 0) {
     var _vsp = vsp;
 
     state = PLAYER_STATE.DEAD;
+    if (using != noone) interact_end(using);   // libera la PC que estaba usando
+    audio_play_sfx(snd_player_death, 0.04, SFX_PRIORITY_HIGH);
     hsp = 0;
     vsp = 0;
     visible = false;   // con visible = false, GameMaker no ejecuta el Draw
@@ -44,6 +46,9 @@ function player_die(_dir = 0, _power = 0) {
     // Si murió cayendo fuera del mapa no se crean piezas: no habría nada que ver
     // y caerían para siempre.
     if (y < room_height) {
+        // Pelo: hacia donde iba la bala; sin golpe (no debería pasar hoy), en todas direcciones.
+        var _spread = (_power > 0) ? FX_FUR_DEATH_SPREAD : 180;
+        fx_fur(x, y + FX_FUR_BODY_Y, _dir, _spread, player_get_color_index(player_index), FX_FUR_DEATH_COUNT);
         corpse_spawn(x, y, facing, _hsp, _vsp, player_get_color_index(player_index), _dir, _power);
     }
 }

@@ -28,7 +28,8 @@ function WeaponDef() constructor {
     ammo_id      = AMMO_ID.LIGHT;   // tipo de bala (ver scr_ammo_data)
     impact_mult  = 1;               // × AmmoDef.impact: ajusta el empujón por arma sin cambiar la munición
                                     // (la SMG comparte LIGHT con la pistola pero dispara mucho más seguido)
-    snd_empty    = undefined;       // sonido del clic vacío (undefined = sin sonido todavía)
+    snd_fire     = undefined;       // sonido del disparo (uno por disparo, no por perdigón)
+    snd_empty    = snd_weapon_empty;  // sonido del clic vacío (el mismo para todas, salvo que un arma lo cambie)
     // Recarga manual (bombeo/cerrojo): tras CADA disparo, la siguiente pulsación del mismo
     // botón recarga en vez de disparar.
     needs_rack   = false;
@@ -62,6 +63,7 @@ function weapon_data_init() {
     global.weapon_defs = array_create(WEAPON_ID.COUNT);
 
     var _pistol = new WeaponDef();
+    _pistol.snd_fire      = snd_pistol_fire;
     _pistol.name          = "Pistola";
     _pistol.sprite        = spr_weapon_pistol;
     _pistol.flash_count   = 10;
@@ -77,6 +79,8 @@ function weapon_data_init() {
     global.weapon_defs[WEAPON_ID.PISTOL] = _pistol;
 
     var _shotgun = new WeaponDef();
+    _shotgun.snd_fire      = snd_shotgun_fire;
+    _shotgun.snd_rack      = snd_shotgun_rack;
     _shotgun.name          = "Escopeta";
     _shotgun.sprite        = spr_weapon_shotgun;
     _shotgun.flash_count   = 14;
@@ -104,6 +108,7 @@ function weapon_data_init() {
 
    
     var _magnum = new WeaponDef();
+    _magnum.snd_fire      = snd_magnum_fire;
     _magnum.name          = "Magnum";
     _magnum.sprite        = spr_weapon_magnum;
     _magnum.flash_count   = 12;
@@ -122,6 +127,7 @@ function weapon_data_init() {
     global.weapon_defs[WEAPON_ID.MAGNUM] = _magnum;
 
     var _smg = new WeaponDef();
+    _smg.snd_fire      = snd_smg_fire;
     _smg.name          = "SMG";
     _smg.sprite        = spr_weapon_smg;
     _smg.flash_count   = 4;

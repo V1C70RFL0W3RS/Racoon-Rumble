@@ -16,6 +16,8 @@ if (array_length(_col_h) > 0) {
 // Vertical: al bajar y chocar, aterrizó (o rebota si floor_bounce lo permite); al subir
 // y chocar con un techo, solo se detiene.
 var _landed = false;
+var _fall = vsp;                          // con qué velocidad baja este frame (para aplastar)
+var _b0   = y + mask_bottom_offset();     // borde inferior antes de bajar (plataformas y aplastar)
 var _col_v = move_and_collide(0, vsp, tilemap);
 if (array_length(_col_v) > 0) {
     if (vsp > HOLDABLE_BOUNCE_MIN_SPEED && floor_bounce > 0) {
@@ -27,7 +29,18 @@ if (array_length(_col_v) > 0) {
         }
         vsp = 0;
     }
+} else if (_fall >= 0) {
+    // No tocó el mapa: ¿aterrizó sobre una plataforma (otra caja)? Así se apilan.
+    var _foot = mask_bottom_offset();
+    var _p = platform_find_below(bbox_left, bbox_right, _b0, y + _foot, id);
+    if (_p != noone) {
+        y = _p.bbox_top - 1 - _foot;
+        vsp = 0;
+        _landed = true;
+        hsp = approach(hsp, 0, HOLDABLE_GROUND_FRICTION);
+    }
 }
+holdable_try_crush(_fall, _b0);   // después de moverse: ¿le cayó en la cabeza a alguien?
 // Fricción en el aire (Duck Game: la del suelo × 0.7). Solo si no aterrizó este frame.
 if (!_landed) hsp = approach(hsp, 0, HOLDABLE_AIR_FRICTION * air_friction_mult);
 // Rotación: gira en el aire; al aterrizar decide si queda de pie o acostada.

@@ -11,3 +11,4 @@ floor_bounce      = CORPSE_BOUNCE;
 shootable         = true;                 // las balas lo empujan y se detienen en él
 impact_mult       = CORPSE_IMPACT_MULT;
 block_chance      = CORPSE_BLOCK_CHANCE;  // escudo imperfecto: parte de las balas lo atraviesa
+hit_fx            = HIT_FX.FUR;           // suelta pelo al recibir un disparo

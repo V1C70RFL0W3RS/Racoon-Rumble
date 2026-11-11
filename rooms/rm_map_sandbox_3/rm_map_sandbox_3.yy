@@ -11,6 +11,10 @@
     {"name":"inst_28F67AC9_1_1","path":"rooms/rm_map_sandbox_3/rm_map_sandbox_3.yy",},
     {"name":"inst_66A81623","path":"rooms/rm_map_sandbox_3/rm_map_sandbox_3.yy",},
     {"name":"inst_62DADA4F","path":"rooms/rm_map_sandbox_3/rm_map_sandbox_3.yy",},
+    {"name":"inst_56CCD6C","path":"rooms/rm_map_sandbox_3/rm_map_sandbox_3.yy",},
+    {"name":"inst_5817FDB9","path":"rooms/rm_map_sandbox_3/rm_map_sandbox_3.yy",},
+    {"name":"inst_540485FF","path":"rooms/rm_map_sandbox_3/rm_map_sandbox_3.yy",},
+    {"name":"inst_671B5E8D","path":"rooms/rm_map_sandbox_3/rm_map_sandbox_3.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -23,6 +27,10 @@
         {"$GMRInstance":"v4","%Name":"inst_62DADA4F","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_62DADA4F","objectId":{"name":"obj_weapon_spawner","path":"objects/obj_weapon_spawner/obj_weapon_spawner.yy",},"properties":[
             {"$GMOverriddenProperty":"v1","%Name":"","name":"","objectId":{"name":"obj_weapon_spawner","path":"objects/obj_weapon_spawner/obj_weapon_spawner.yy",},"propertyId":{"name":"weapon_choice","path":"objects/obj_weapon_spawner/obj_weapon_spawner.yy",},"resourceType":"GMOverriddenProperty","resourceVersion":"2.0","value":"\"Aleatoria fija\"",},
           ],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":0.53125,"scaleY":0.5,"x":421.0,"y":384.0,},
+        {"$GMRInstance":"v4","%Name":"inst_56CCD6C","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_56CCD6C","objectId":{"name":"obj_crate","path":"objects/obj_crate/obj_crate.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":559.0,"y":433.0,},
+        {"$GMRInstance":"v4","%Name":"inst_5817FDB9","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_5817FDB9","objectId":{"name":"obj_crate","path":"objects/obj_crate/obj_crate.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":576.0,"y":448.0,},
+        {"$GMRInstance":"v4","%Name":"inst_540485FF","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_540485FF","objectId":{"name":"obj_crate","path":"objects/obj_crate/obj_crate.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":640.0,"y":416.0,},
+        {"$GMRInstance":"v4","%Name":"inst_671B5E8D","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_671B5E8D","objectId":{"name":"obj_crate","path":"objects/obj_crate/obj_crate.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":704.0,"y":384.0,},
       ],"layers":[],"name":"layer_items","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRInstanceLayer":"","%Name":"layer_players","depth":300,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":true,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[],"layers":[],"name":"layer_players","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRInstanceLayer":"","%Name":"layer_level","depth":400,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":true,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[

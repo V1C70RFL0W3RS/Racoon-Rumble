@@ -17,6 +17,7 @@ function projectile_spawn(_x, _y, _angle, _ammo, _owner, _origin_x = undefined, 
         damage: _ammo.damage,
         life:   _ammo.life,
         impact: _ammo.impact * _impact_mult,
+        object_damage: _ammo.object_damage,
         pierce: _ammo.pierce,   // se descuenta en cada objeto atravesado
         owner:  _owner,
         prev_x: _origin_x,
@@ -100,7 +101,7 @@ function projectile_draw_strip(_tx, _ty, _x, _y, _dir, _width, _col_tail, _a_tai
 }
 
 /// @desc Primer objetivo que cruza el segmento (_x1,_y1)->(_x2,_y2): un jugador vivo o un
-///       holdable 'shootable' suelto. Ignora al dueño de la bala y a lo que esté en _ignore
+///       holdable 'shootable' (suelto, o sostenido si es escudo: shield_when_held). Ignora al dueño de la bala y a lo que esté en _ignore
 ///       (lo ya atravesado por una bala con pierce). Devuelve noone si no hay ninguno.
 ///       "Primero" = el de menor avance a lo largo del segmento (proyección de su centro sobre
 ///       la dirección de la bala), no el más cercano en línea recta: así un objetivo al costado
@@ -122,7 +123,8 @@ function projectile_find_hit(_x1, _y1, _x2, _y2, _owner, _ignore) {
     }
     with (obj_holdable) {
         // Las comprobaciones baratas primero: la mayoría (armas) se descarta sin tocar colisiones.
-        if (!shootable || holder != noone) continue;
+        if (!shootable) continue;
+        if (holder != noone && (!shield_when_held || holder == _owner)) continue;
         if (array_contains(_ignore, id)) continue;
         if (collision_line(_x1, _y1, _x2, _y2, id, true, false) != noone) {
             var _t = (x - _x1) * _dx + (y - _y1) * _dy;

@@ -1,8 +1,6 @@
 if (keyboard_check_pressed(vk_enter)) {
-    match_settings_init(
-        MATCH_DEFAULT_SCORE_TO_WIN,
-        MATCH_DEFAULT_ROUNDS_PER_BLOCK,
-        match_scan_maps()
-    );
+    // Los ajustes salen de la PC del host (global.match.lobby_settings).
+    var _s = global.match.lobby_settings;
+    match_settings_init(_s.score_to_win, _s.rounds_per_block, match_scan_maps());
     match_start();
 }

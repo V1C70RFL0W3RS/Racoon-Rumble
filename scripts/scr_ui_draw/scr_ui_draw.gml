@@ -59,3 +59,25 @@ function debug_draw_dot(_x, _y, _col) {
     draw_rectangle_color(_x - DEBUG_DOT_HALF, _y - DEBUG_DOT_HALF,
                          _x + DEBUG_DOT_HALF, _y + DEBUG_DOT_HALF, _col, _col, _col, _col, false);
 }
+
+
+/// @desc Coordenadas del mundo → GUI (la GUI va a tamaño real de pantalla, la vista no).
+function world_to_gui_x(_x) {
+    var _c = view_camera[0];
+    return (_x - camera_get_view_x(_c)) * display_get_gui_width() / camera_get_view_width(_c);
+}
+function world_to_gui_y(_y) {
+    var _c = view_camera[0];
+    return (_y - camera_get_view_y(_c)) * display_get_gui_height() / camera_get_view_height(_c);
+}
+
+/// @desc Aviso corto centrado en _gx con su borde de abajo en _gy (GUI). P. ej. "Agarrar: usar".
+function ui_draw_hint_at(_text, _gx, _gy) {
+    draw_set_font(fnt_body);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_bottom);
+    draw_text_colour(_gx + 1, _gy + 1, _text, c_black, c_black, c_black, c_black, 1);
+    draw_text_colour(_gx, _gy, _text, MENU_COLOR, MENU_COLOR, MENU_COLOR, MENU_COLOR, 1);
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
