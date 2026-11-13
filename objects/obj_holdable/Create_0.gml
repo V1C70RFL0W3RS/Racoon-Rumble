@@ -43,6 +43,16 @@ platform = false;
 // > 0 = si cae sobre la cabeza de un jugador a esta velocidad (px/frame) o más, lo mata.
 crush_speed = 0;
 
+// Jugador VIVO al que pertenece este objeto como cuerpo (piezas de un ragdoll). noone = de nadie.
+// Una bala o una caja que lo golpea, golpea a ese jugador (ver obj_projectile y holdable_try_crush).
+body_of = noone;
+
+// Ranura donde se PONE (EQUIP_SLOT.HEAD, BODY, FEET), o EQUIP_NONE si no se equipa. Agarrar algo
+// equipable con las manos vacías lo pone en vez de llevarlo en la mano (ver scr_equipment).
+equip_slot = EQUIP_NONE;
+// Campos de equipo (balas que detiene, si pisotea, etc.) con sus valores por defecto: scr_equipment.
+equip_fields_init(id);
+
 // Cómo se dibuja mientras alguien lo sostiene (lo actualiza player_update_held_position).
 // Algunos objetos, como las mitades del cadáver, lo necesitan para ubicar su punto de unión.
 held_angle  = 0;

@@ -7,8 +7,8 @@ palette_apply(_color);
 draw_sprite_ext(sprite_index, image_index, x, y, facing, 1, 0, c_white, 1);
 palette_reset();
 
-// 1b. Gorro (sin color), sobre la cabeza
-hat_draw(player_get_hat_index(player_index), player_hat_x(), player_hat_y(), facing);
+// 1b. Equipamiento puesto (sin color): pies, cuerpo y gorro
+player_draw_equipment();
 
 // 2. Arma (sin color), en la mano
 if (held_item != noone) {

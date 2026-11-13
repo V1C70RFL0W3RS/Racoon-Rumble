@@ -4,8 +4,10 @@ player_palette_init(); // ANTES de fx_init: los efectos pueden leer los colores 
 hats_init();          // catálogo de gorros (ver scr_hats)
 fx_init();            // tipos de partículas (humo, pelo, etc.)
 weapon_data_init();
+spawn_items_init();   // DESPUÉS de armas y gorros: el catálogo de los spawners los lee
 ammo_data_init();
 player_shoulder_table_init();
+player_equip_table_init();  // dónde va cada ranura de equipo en cada pose (scr_player_visuals)
 global.match = {}; // se va completando a medida que avanza cada fase del flujo
 lobby_reset();
 room_goto(rm_menu);

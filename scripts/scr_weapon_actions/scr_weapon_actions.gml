@@ -114,7 +114,7 @@ function weapon_draw_dry_flash(_weapon, _x, _y, _angle, _facing) {
 ///       Si alguien la agarra antes, se cancela. Una vez que empezó a desvanecerse ya no
 ///       importa si la empujan: termina igual.
 ///       DECISIÓN: el spawner no necesita saber nada; si su arma deja de existir, el punto
-///       queda libre y su cuenta regresiva genera otra (ver obj_weapon_spawner).
+///       queda libre y su cuenta regresiva genera otra (ver obj_item_spawner).
 /// @param {Id.Instance} _w Instancia de obj_weapon.
 function weapon_update_despawn(_w) {
     with (_w) {

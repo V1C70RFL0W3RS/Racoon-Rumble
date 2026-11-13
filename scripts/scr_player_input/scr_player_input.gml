@@ -8,6 +8,7 @@ function input_empty() {
         fire_pressed: false,
         fire_held:    false,
         grab_pressed: false,
+        ragdoll_pressed: false,
         up_held:      false,
         down_held:    false
     };
@@ -25,13 +26,15 @@ function get_player_input(player_index) {
     var _device = global.match.players_joined[player_index];
 
     if (_device.device_type == "keyboard") {
-        // Teclado (sin mouse): A/D mover, W/S arriba/abajo, Espacio saltar, C agarrar/tirar, V disparar.
+        // Teclado (sin mouse): A/D mover, W/S arriba/abajo, Espacio saltar, C agarrar/tirar, V disparar,
+        // X ragdoll.
         _input.move_x       = keyboard_check(ord("D")) - keyboard_check(ord("A"));
         _input.jump_pressed = keyboard_check_pressed(vk_space);
         _input.jump_held    = keyboard_check(vk_space);
         _input.fire_pressed = keyboard_check_pressed(ord("V"));
         _input.fire_held    = keyboard_check(ord("V"));
         _input.grab_pressed = keyboard_check_pressed(ord("C"));
+        _input.ragdoll_pressed = keyboard_check_pressed(ord("X"));
         _input.up_held      = keyboard_check(ord("W"));
         _input.down_held    = keyboard_check(ord("S"));
 
@@ -43,6 +46,7 @@ function get_player_input(player_index) {
         _input.fire_pressed = keyboard_check_pressed(vk_numpad2);
         _input.fire_held    = keyboard_check(vk_numpad2);
         _input.grab_pressed = keyboard_check_pressed(vk_numpad1);
+        _input.ragdoll_pressed = keyboard_check_pressed(vk_numpad3);
         _input.up_held      = keyboard_check(vk_up);
         _input.down_held    = keyboard_check(vk_down);
 
@@ -62,6 +66,7 @@ function get_player_input(player_index) {
             _input.fire_pressed = gamepad_button_check_pressed(_gp, gp_shoulderrb);
             _input.fire_held    = gamepad_button_check(_gp, gp_shoulderrb);
             _input.grab_pressed = gamepad_button_check_pressed(_gp, gp_face3);
+            _input.ragdoll_pressed = gamepad_button_check_pressed(_gp, gp_face4);   // Y / Triángulo
         }
     }
 

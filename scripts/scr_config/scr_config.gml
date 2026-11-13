@@ -2,7 +2,7 @@
 /// Organizado por sistema. Al agregar una macro, ponla en su sección (no al final del archivo).
 
 // Activa los afinadores y la depuración temporal (hombro, cadáver). Poner en false para publicar.
-#macro DEBUG_TOOLS true
+#macro DEBUG_TOOLS false
 #macro Release:DEBUG_TOOLS false
 #macro DEBUG_DOT_HALF 1   // puntos de depuración: cuadro de (2 × esto + 1) px; 1 = 3x3, 2 = 5x5
 
@@ -11,7 +11,7 @@
 // =============================================================================
 #macro MAX_PLAYERS 8
 #macro PLAYER_MAX_HP 1                  // 1 = un golpe mata (pilar de diseño)
-enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
+enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD, RAGDOLL }
 
 // --- Movimiento horizontal (Duck Game, biblia 4.3 y 4.3.1) ---
 #macro PLAYER_MOVE_SPEED  3.1
@@ -35,10 +35,7 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro PLAYER_COYOTE_FRAMES       7
 #macro PLAYER_JUMP_BUFFER_FRAMES  4
 #macro PLAYER_CORNER_CORRECT_PX   4     // NO es de Duck Game: ayuda extra, se puede quitar
-#macro PLAYER_PLATFORM_DROP_FRAMES 4
-// --- Gorro: base respecto del HOMBRO (que ya sigue el rebote de cada frame) ---
-#macro PLAYER_HAT_DX  1      // + = hacia donde mira
-#macro PLAYER_HAT_DY -10     // - = más arriba    // frames que ignora las plataformas (cajas) tras bajarse con abajo + saltar
+#macro PLAYER_PLATFORM_DROP_FRAMES 4     // frames que ignora las plataformas (cajas) tras bajarse con abajo + saltar
 
 // --- Animación ---
 #macro PLAYER_RUN_ANIM_RATE     0.08    // frames de animación avanzados por cada píxel/step de velocidad
@@ -136,11 +133,10 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro AMMO_PIPS_GAP         1    // separación entre puntitos, en px
 #macro AMMO_PIPS_MARGIN_Y    3    // px entre la cabeza y la fila de abajo
 
-// --- Spawners ---
-#macro WEAPON_SPAWNER_RESPAWN_FRAMES 300   // frames que espera un punto libre antes de generar otra arma (5 s a 60 fps)
-#macro WEAPON_SPAWNER_CHECK_RADIUS   20    // px: si el arma se aleja más que esto, el punto cuenta como libre
-/// Opción "arma al azar, decidida una sola vez por ronda" (weapon_choice del spawner).
-#macro WEAPON_CHOICE_RANDOM_LOCKED "Aleatoria fija"
+// --- Spawners de objetos (obj_item_spawner, catálogo en scr_spawn_items) ---
+enum SPAWN_GROUP { WEAPON, HAT, EQUIPMENT }   // grupos de las opciones aleatorias
+#macro ITEM_SPAWNER_RESPAWN_FRAMES 300   // frames que espera un punto libre antes de generar otro objeto (5 s a 60 fps)
+#macro ITEM_SPAWNER_CHECK_RADIUS   20    // px: si el objeto se aleja más que esto, el punto cuenta como libre
 
 // =============================================================================
 // CADÁVER
@@ -149,12 +145,69 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro CORPSE_POP_SPEED         -2      // saltito hacia arriba al morir
 #macro CORPSE_SPAWN_JOINT_Y      0      // altura del punto de unión sobre los pies al morir (a ojo: la cintura)
 #macro CORPSE_SPAWN_PUSHOUT      24     // máximo que se mueve el cadáver entero al nacer
-#macro CORPSE_SNAP_FACTOR        5      // si las piezas se separan más de 5 veces su distancia, se reencuentran
+#macro CORPSE_SNAP_FACTOR        5      // si las piezas se separan más de 5 veces el largo del cuerpo, se reencuentran
+#macro CORPSE_HIT_TUMBLE         0.25   // volteo al morir: fracción del empujón horizontal de la bala (el pecho recibe más)
+#macro CORPSE_JOINT_INV_MASS     2      // masa inversa de la cintura (2 = la mitad de una pieza): más alto = más suelta
+#macro CORPSE_JOINT_DAMPING      0.98   // la cintura pierde un poco de velocidad por frame (evita temblores)
+#macro CORPSE_JOINT_RADIUS       6      // radio de la cintura contra el mapa = centro de una pieza tirada -> piso (bbox 22 - origen 16)
+#macro CORPSE_FOLD_MIN           0.8    // las piezas no se acercan a menos de esta fracción de su distancia de reposo (≈ 60° de doblez)
+#macro CORPSE_SPINE_STIFFNESS    0.12   // "columna": cuánto tiende a enderezarse por pasada (0 = trapo, 1 = tabla)
+#macro CORPSE_WORN_BODY_X        0      // chaleco sobre la pieza superior: centro del torso respecto de su origen
+#macro CORPSE_WORN_BODY_Y        3
+#macro CORPSE_SOLVER_PASSES     3      // pasadas del solucionador por frame (más = más firme, más caro)
 #macro CORPSE_AIR_FRICTION_MULT  0.3    // biblia 4.4.5 E: 70 % menos resistencia al aire
 #macro CORPSE_BOUNCE             0.6    // rebota con el 60 % de su velocidad
 #macro CORPSE_DRAW_SLACK         2      // px que puede estirarse el dibujo antes de recortarlo
 #macro CORPSE_IMPACT_MULT        1      // cuánto lo mueve una bala (× AmmoDef.impact)
 #macro CORPSE_BLOCK_CHANCE       0.5    // probabilidad de que CADA pieza detenga una bala (las dos juntas: 75 %)
+
+// =============================================================================
+// RAGDOLL ("hacerse el muerto", scr_player_ragdoll). El cuerpo usa la física del CADÁVER.
+// =============================================================================
+#macro RAGDOLL_COOLDOWN_FRAMES   24     // espera entre entrar y salir (0,4 s a 60 fps): no sirve de esquiva instantánea
+#macro RAGDOLL_INERTIA           1      // fracción de la velocidad del jugador que hereda el cuerpo (1 = toda: sigue su arco)
+#macro RAGDOLL_TUMBLE            0.35   // volteo al tirarse: fracción de hsp (la cabeza se adelanta a los pies)
+#macro RAGDOLL_CRAWL_INTERVAL    16     // frames entre un saltito de arrastre y el siguiente (≈ lo que dura en el aire)
+#macro RAGDOLL_CRAWL_IMPULSE     0.9    // empujón horizontal de cada saltito, IGUAL para las dos piezas (si no, gira)
+#macro RAGDOLL_CRAWL_HOP_LEAD   -1.25   // saltito de la pieza que va adelante (hacia donde se mueve)
+#macro RAGDOLL_CRAWL_HOP_TRAIL  -1.1    // saltito de la de atrás: apenas más bajo, para que la cintura se doble poco
+#macro RAGDOLL_STRUGGLE_INTERVAL 8      // atrapado: frames entre una sacudida y la siguiente
+#macro RAGDOLL_STRUGGLE_IMPULSE  1.8    // atrapado: empujón a la pieza que cuelga
+#macro RAGDOLL_GETUP_HOP        -2.5    // saltito al levantarse
+
+// =============================================================================
+// EQUIPAMIENTO (scr_equipment, ADR-004). Lo puesto se guarda como DATOS en el jugador.
+// =============================================================================
+enum EQUIP_SLOT { HEAD, BODY, FEET, COUNT }
+#macro EQUIP_NONE          -1     // equip_slot de lo que no se equipa (armas, cajas...)
+#macro EQUIP_DROP_POP      -3     // al caerse (ragdoll, muerte), sale volando hacia arriba
+#macro EQUIP_DROP_HSP_VAR   1.5   // ± velocidad horizontal al azar al caerse
+#macro EQUIP_DROP_INERTIA   0.5   // fracción de la velocidad del jugador que hereda
+#macro EQUIP_DROP_SPIN      12    // grados por frame que gira al caerse
+#macro HAT_GRIP_Y          -3     // la mano lo sujeta 3 px sobre la base (origen abajo al centro)
+#macro HAT_AIR_FRICTION_MULT 0.6  // un gorro "planea" un poco más que un arma
+#macro HAT_WORN_DX          -1    // gorro puesto: 1 px más atrás que el casco (de pie, corriendo, saltando, agachado)
+#macro HAT_WORN_DY           0
+#macro ARMOR_BULLET_BLOCK    1    // balas que detiene un casco o un chaleco antes de romperse
+#macro PLAYER_HEAD_ZONE_DEPTH 2   // centro de la cabeza: px "hacia adentro" desde la base del gorro
+#macro PLAYER_HEAD_ZONE_RADIUS 5  // una bala que pasa a esta distancia del centro pega en la cabeza
+#macro HELMET_FRAME_DENTED 1     // frame de spr_helmet abollado (por una caja o un pisotón)
+#macro HELMET_COL_A  make_colour_rgb(98, 112, 58)    // pedazos del casco (verde oliva)
+#macro HELMET_COL_B  make_colour_rgb(66, 76, 38)
+#macro VEST_COL_A    make_colour_rgb(58, 70, 92)     // pedazos del chaleco (azul marino y caqui)
+#macro VEST_COL_B    make_colour_rgb(128, 112, 78)
+#macro BOOTS_COL      make_colour_rgb(104, 68, 40)   // pedazos de las botas
+#macro BOOTS_COL_DARK make_colour_rgb(66, 42, 24)
+#macro PLAYER_STOMP_MIN_FALL 1.5   // con botas, cayendo a esta velocidad o más sobre una cabeza, la pisa y mata
+#macro PLAYER_STOMP_BOUNCE   4     // rebote al pisar una cabeza (como un salto corto)
+#macro PLAYER_SPIKE_POP      3     // empujón hacia arriba del cadáver al morir en pinchos
+// Objetos destructibles (cajas) que caen sobre pinchos. Velocidad al llegar = √(0.4 × altura en px):
+// soltada desde la mano (~12 px) llega a ~2 → nada; 3 bloques (48 px) ~4,4 → 2 de daño (se raja);
+// ~7 bloques (115 px) ~6,8 → 4 de daño → la caja (4 de vida) se rompe.
+#macro SPIKE_BREAK_MIN_SPEED   3      // px/frame: más lento no le hace nada
+#macro SPIKE_SPEED_PER_DAMAGE  1.25   // cada tanto más rápido, +1 de daño
+// Zonas de un golpe: qué ranura lo puede detener (scr_equipment, equip_block_order).
+enum HIT_ZONE { HEAD, BODY, TOP }
 
 // =============================================================================
 // CAJA (obj_crate)
@@ -203,6 +256,8 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro FX_SPLINTER_SPEED_MAX   3.5
 #macro FX_SPLINTER_LIFT        1      // impulso extra hacia arriba, para que salten
 #macro FX_SPLINTER_LIFE        300    // frames (5 s)
+#macro FX_ARMOR_SHARD_COUNT    10     // pedazos al romperse un casco o un chaleco
+#macro FX_ARMOR_SHARD_SPREAD   70
 #macro FX_WOOD_COL_LIGHT  make_colour_rgb(198, 134, 72)   // mismos tonos que spr_crate
 #macro FX_WOOD_COL_DARK   make_colour_rgb(110, 62, 30)
 
@@ -233,6 +288,14 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 
 // --- Lobby: PCs y ajustes del host ---
 #macro LOBBY_HOST_INDEX   0      // en local, el host es el primero que se unió
+// --- Tubo de llegada (obj_lobby_tube) ---
+#macro LOBBY_TUBE_INTERVAL  40     // frames entre un jugador y el siguiente
+#macro LOBBY_TUBE_HSP_MIN   3      // velocidad con que sale escupido (al azar entre MIN y MAX)
+#macro LOBBY_TUBE_HSP_MAX   5
+#macro LOBBY_TUBE_VSP      -2.5    // y un poco hacia arriba
+#macro LOBBY_TUBE_PIPE_X    3      // tramo vertical del caño dentro de spr_lobby_tube: x, ancho y alto
+#macro LOBBY_TUBE_PIPE_W    18     // de la porción que se repite hacia arriba hasta el techo
+#macro LOBBY_TUBE_PIPE_H    6
 #macro LOBBY_SCORE_MIN    1
 #macro LOBBY_SCORE_MAX    20
 #macro LOBBY_ROUNDS_MIN   1
@@ -249,6 +312,8 @@ enum PLAYER_STATE { IDLE, RUN, JUMP, FALL, CROUCH, SLIDE, HURT, DEAD }
 #macro MENU_REPEAT_RATE   6      // frames entre repeticiones
 #macro MENU_COLOR         make_colour_rgb(60, 230, 90)   // verde de pantalla (como spr_lobby_pc)
 #macro MENU_BG_ALPHA      0.85
+#macro MENU_CTX_USER      -100   // contexto de opción = el player_index de quien usa el menú (ropero)
+#macro INTERACT_MENU_DY   -34    // el menú de cada usuario se dibuja con su borde de abajo aquí (px sobre sus pies)
 
 // =============================================================================
 // CÁMARA

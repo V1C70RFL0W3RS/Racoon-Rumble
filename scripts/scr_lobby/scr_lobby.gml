@@ -62,25 +62,65 @@ function lobby_add_player(_device_type, _device_index) {
 /// presiona y hay lugar (respetando max_players), lo agrega.
 /// Se llama una vez por Step desde el controlador del menú/lobby.
 /// </summary>
+/// <returns>Array con el player_index de cada jugador que se unió en este frame (suele estar vacío).</returns>
 function lobby_scan_join() {
-    if (array_length(global.match.players_joined) >= lobby_get_max_players()) return;
+    var _new = [];
+    if (array_length(global.match.players_joined) >= lobby_get_max_players()) return _new;
 
     // Jugador teclado normal (WASD + espacio): uno solo posible.
     if (!lobby_device_joined("keyboard", 0) && keyboard_check_pressed(LOBBY_JOIN_KEY)) {
-        lobby_add_player("keyboard", 0);
+        lobby_join_push(_new, "keyboard", 0);
     }
 
     // TEMPORAL: segundo teclado de testeo (flechas + numpad).
     if (!lobby_device_joined("keyboard2", 0) && keyboard_check_pressed(LOBBY_JOIN_KEY_TEST)) {
-        lobby_add_player("keyboard2", 0);
+        lobby_join_push(_new, "keyboard2", 0);
     }
 
     // Gamepads conectados (mismo botón que el salto: gp_face1).
     for (var g = 0; g < 12; g++) {
         if (!gamepad_is_connected(g)) continue;
         if (lobby_device_joined("gamepad", g)) continue;
-        if (gamepad_button_check_pressed(g, gp_face1)) lobby_add_player("gamepad", g);
+        if (gamepad_button_check_pressed(g, gp_face1)) lobby_join_push(_new, "gamepad", g);
     }
+    return _new;
+}
+
+/// @desc Agrega un jugador y, si entró, anota su player_index en _list.
+function lobby_join_push(_list, _device_type, _device_index) {
+    if (lobby_add_player(_device_type, _device_index)) {
+        array_push(_list, array_length(global.match.players_joined) - 1);
+    }
+}
+
+// =============================================================================
+// LLEGADA POR EL TUBO (obj_lobby_tube)
+// DECISIÓN: es el ÚNICO camino para aparecer en el lobby: los que se unieron en el menú y los que
+// se unen ya en el lobby salen igual, de a uno, escupidos en ragdoll (Fase 5). Sin tubo en la
+// room, se usan los spawn points de siempre.
+// =============================================================================
+
+/// @desc Pone a un jugador en la fila del tubo. Devuelve false si la room no tiene tubo.
+function lobby_tube_enqueue(_player_index) {
+    var _tube = instance_find(obj_lobby_tube, 0);
+    if (_tube == noone) return false;
+    array_push(_tube.queue, _player_index);
+    return true;
+}
+
+/// @desc Crea al jugador en la boca del tubo y lo escupe en ragdoll (el gorro sale volando aparte:
+///       lo tiene que ir a buscar). Lo llama el Step de obj_lobby_tube.
+function lobby_tube_launch(_tube, _player_index) {
+    var _dir = _tube.image_xscale;
+    var _p = instance_create_layer(_tube.x, _tube.y, "layer_players", obj_player, { player_index: _player_index });
+    with (_p) {
+        facing = _dir;
+        hsp = _dir * random_range(LOBBY_TUBE_HSP_MIN, LOBBY_TUBE_HSP_MAX);
+        vsp = LOBBY_TUBE_VSP;
+        player_ragdoll_enter();   // hereda hsp/vsp: sale volando y girando
+    }
+    fx_smoke_puff(_tube.x, _tube.y);
+    audio_play_sfx(snd_shotgun_rack, 0.1);   // PLACEHOLDER: snd_tube_plop
 }
 
 // =============================================================================
@@ -105,6 +145,8 @@ function lobby_set_hat(_player_index, _dir) {
     var _p = global.match.players_joined[_player_index];
     var _n = hat_count();
     _p.hat_index = (_p.hat_index + _dir + _n) mod _n;
+    // Si ya está en la sala, se le cambia el gorro que lleva puesto en el momento.
+    with (obj_player) if (player_index == _player_index) player_equip_lobby_hat();
 }
 
 /// @desc Cambia un ajuste de la partida. Solo el host; el valor queda dentro de su rango.

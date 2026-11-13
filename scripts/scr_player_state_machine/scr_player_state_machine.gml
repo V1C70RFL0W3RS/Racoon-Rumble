@@ -5,7 +5,7 @@ function player_update_state(player) {
         // Agachado y slide los deciden las banderas de física (player_update_crouch):
         // tienen prioridad mientras estén activas. Al soltarlas se vuelve a IDLE y el
         // switch de abajo afina (RUN, FALL...) en este mismo frame.
-        if (state != PLAYER_STATE.HURT && state != PLAYER_STATE.DEAD) {
+        if (state != PLAYER_STATE.HURT && state != PLAYER_STATE.DEAD && state != PLAYER_STATE.RAGDOLL) {
             if (sliding)        state = PLAYER_STATE.SLIDE;
             else if (crouching) state = PLAYER_STATE.CROUCH;
             else if (state == PLAYER_STATE.CROUCH || state == PLAYER_STATE.SLIDE) state = PLAYER_STATE.IDLE;
@@ -44,6 +44,10 @@ function player_update_state(player) {
 
             case PLAYER_STATE.DEAD:
                 // PENDIENTE: se define cuando exista el sistema de rondas
+                break;
+
+            case PLAYER_STATE.RAGDOLL:
+                // Lo maneja scr_player_ragdoll (el Step de obj_player no llega hasta aquí).
                 break;
         }
     }

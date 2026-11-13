@@ -1,12 +1,12 @@
 {
   "$GMObject":"",
-  "%Name":"obj_weapon_spawner",
+  "%Name":"obj_item_spawner",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"obj_weapon_spawner",
+  "name":"obj_item_spawner",
   "overriddenProperties":[],
   "parent":{
     "name":"Level",
@@ -27,14 +27,25 @@
   "physicsShapePoints":[],
   "physicsStartAwake":true,
   "properties":[
-    {"$GMObjectProperty":"v2","%Name":"weapon_choice","filters":[],"listItems":[
+    {"$GMObjectProperty":"v2","%Name":"item_choice","filters":[],"listItems":[
         "\"Aleatoria fija\"",
         "\"Aleatoria\"",
         "\"Pistola\"",
         "\"Escopeta\"",
         "\"Magnum\"",
         "\"SMG\"",
-      ],"multiselect":false,"name":"weapon_choice","rangeEnabled":false,"rangeMax":10.0,"rangeMin":-1.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"Aleatoria fija\"","varType":6,},
+        "\"Gorro aleatorio fijo\"",
+        "\"Gorro aleatorio\"",
+        "\"Gorra\"",
+        "\"Sombrero\"",
+        "\"Corona\"",
+        "\"Gorro de lana\"",
+        "\"Equipo aleatorio fijo\"",
+        "\"Equipo aleatorio\"",
+        "\"Casco\"",
+        "\"Chaleco\"",
+        "\"Botas\"",
+      ],"multiselect":false,"name":"item_choice","rangeEnabled":false,"rangeMax":10.0,"rangeMin":-1.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"Aleatoria fija\"","varType":6,},
   ],
   "resourceType":"GMObject",
   "resourceVersion":"2.0",

@@ -68,3 +68,14 @@ vuelva a preguntar por qué está hecho así.
   desincrustarse. Es barata con el tilemap, pero se debe revisar si algún día hay muchos.
 - **Las constantes del cadáver** (distancias, masas, rebote 0.6, recorte de 8 px) vienen de la biblia y no
   se verificaron contra el código fuente real de Duck Game.
+
+
+## Actualización — Fase 5, Parte 1 (11 nov 2026)
+El trade-off "**un solo ángulo para las dos mitades del cadáver**" se revirtió. En modo ragdoll el
+cuerpo se veía rígido (las dos mitades giraban juntas, como una tabla). Ahora hay **tres puntos**,
+como en Duck Game: parte superior, **cintura invisible** (`rig` en la pieza superior) e inferior,
+unidos por dos varillas, más un tope de distancia mínima entre las piezas para que la cintura se
+doble sin plegarse del todo (`CORPSE_FOLD_MIN`). Cada pieza saca su ángulo de la dirección
+cintura → pieza. La cintura choca con el mapa como un punto (`tilemap_get_at_pixel`).
+Sigue resolviéndose una sola vez por frame en el Begin Step de la pieza superior, y la pieza que
+está en una mano sigue siendo el punto fijo. Afecta a cadáveres y ragdolls por igual.

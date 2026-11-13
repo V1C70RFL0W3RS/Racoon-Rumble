@@ -114,7 +114,7 @@ function projectile_find_hit(_x1, _y1, _x2, _y2, _owner, _ignore) {
     var _best_t = infinity;
 
     with (obj_player) {
-        if (id == _owner || state == PLAYER_STATE.DEAD) continue;
+        if (id == _owner || !player_is_upright()) continue;   // en ragdoll se le pega a su cuerpo (holdables)
         // precise = true: usa la máscara real, no la caja
         if (collision_line(_x1, _y1, _x2, _y2, id, true, false) != noone) {
             var _t = (x - _x1) * _dx + (y - _y1) * _dy;

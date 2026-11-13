@@ -41,6 +41,8 @@ if (array_length(_col_v) > 0) {
     }
 }
 holdable_try_crush(_fall, _b0);   // después de moverse: ¿le cayó en la cabeza a alguien?
+// ¿Chocó contra el piso cayendo sobre pinchos? Un destructible se daña según la velocidad.
+if (array_length(_col_v) > 0 && _fall > 0 && holdable_try_spikes(_fall)) exit;   // se rompió
 // Fricción en el aire (Duck Game: la del suelo × 0.7). Solo si no aterrizó este frame.
 if (!_landed) hsp = approach(hsp, 0, HOLDABLE_AIR_FRICTION * air_friction_mult);
 // Rotación: gira en el aire; al aterrizar decide si queda de pie o acostada.

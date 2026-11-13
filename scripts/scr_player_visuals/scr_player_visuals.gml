@@ -218,6 +218,77 @@ function player_get_shoulder_offset() {
     return (_t == undefined) ? global.shoulder_offset_zero : _t[image_index];
 }
 
+// =============================================================================
+// EQUIPAMIENTO: dónde va cada ranura (cabeza, cuerpo, pies), por sprite y frame
+// =============================================================================
+
+/// @desc Tablas de pose del equipamiento: por ranura, un [dx, dy, ángulo] por frame de cada
+///       sprite, respecto del ORIGEN del jugador (sus pies). dx hacia adelante, dy hacia abajo
+///       (positivos), ángulo en grados (0 = derecho; 90 = apunta hacia atrás, como en el slide,
+///       que va acostado). Medidos en los sprites:
+///         - CABEZA: base del gorro = 3 px bajo la punta de las orejas, centro de la cabeza.
+///         - CUERPO: centro del torso (el chaleco tiene su origen en el centro).
+///         - PIES: el origen (todavía no hay calzado).
+///       Llamar UNA vez al arrancar (obj_game_manager, Create).
+function player_equip_table_init() {
+    global.equip_poses = array_create(EQUIP_SLOT.COUNT);
+
+    // Cabeza (afinada a ojo con el usuario).
+    global.equip_poses[EQUIP_SLOT.HEAD] = {
+        none:   [0, -21, 0],
+        run:    [ [0, -21, 0], [0, -23, 0], [0, -22, 0], [0, -21, 0], [0, -23, 0], [0, -22, 0] ],
+        jump:   [ [0, -21, 0], [1, -22, 0], [0, -23, 0] ],
+        crouch: [ [1, -17, 0] ],
+        slide:  [ [-10, -7, 90] ]    // acostado boca arriba, la cabeza atrás
+    };
+    // Cuerpo: el torso sube y baja con el mismo rebote que la cabeza.
+    global.equip_poses[EQUIP_SLOT.BODY] = {
+        none:   [-1, -10, 0],
+        run:    [ [-1, -10, 0], [-1, -12, 0], [-1, -11, 0], [-1, -10, 0], [-1, -12, 0], [-1, -11, 0] ],
+        jump:   [ [-1, -10, 0], [0, -11, 0], [-1, -12, 0] ],
+        crouch: [ [1, -8, 0] ],
+        slide:  [ [1, -7, 90] ]
+    };
+    // Pies: sin calzado todavía; queda el lugar listo.
+    global.equip_poses[EQUIP_SLOT.FEET] = {
+        none:   [0, 0, 0],
+        run:    [ [0, 0, 0] ],
+        jump:   [ [0, 0, 0] ],
+        crouch: [ [0, 0, 0] ],
+        slide:  [ [6, -2, 90] ]
+    };
+}
+
+/// @desc Las botas puestas tienen UN frame por cada frame del cuerpo, en este orden: correr (0-5),
+///       saltar (6-8), agachado (9), slide (10). Devuelve el frame de las botas que corresponde al
+///       frame 0 de un sprite del cuerpo, o -1 si ese sprite no tiene botas. La pieza inferior del
+///       ragdoll usa su propio sprite de botas (frame 0). Ver equip_draw_feet.
+function feet_frame_base(_spr) {
+    switch (_spr) {
+        case spr_player_run:    return 0;
+        case spr_player_jump:   return 6;
+        case spr_player_crouch: return 9;
+        case spr_player_slide:  return 10;
+        case spr_corpse_lower:  return 0;
+    }
+    return -1;
+}
+
+/// @desc [dx, dy, ángulo] de una ranura para el sprite y frame actuales. Ejecutar como el jugador.
+///       Un sprite sin tabla (o con menos frames) usa la pose "none" (o el último frame).
+function player_get_equip_pose(_slot) {
+    var _set = global.equip_poses[_slot];
+    var _t;
+    switch (sprite_index) {
+        case spr_player_run:    _t = _set.run;    break;
+        case spr_player_jump:   _t = _set.jump;   break;
+        case spr_player_crouch: _t = _set.crouch; break;
+        case spr_player_slide:  _t = _set.slide;  break;
+        default: return _set.none;
+    }
+    return _t[min(image_index, array_length(_t) - 1)];
+}
+
 /// @desc Posición X del hombro en el mundo. facing espeja el lado al mirar a la izquierda.
 function player_shoulder_x() {
     var _o = player_get_shoulder_offset();

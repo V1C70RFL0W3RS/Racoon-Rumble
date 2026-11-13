@@ -3,6 +3,7 @@ event_inherited();
 if (!variable_instance_exists(id, "piece_frame")) piece_frame = 0;
 
 partner = noone;   // la otra mitad; lo asigna corpse_spawn después de crear las dos
+rig     = undefined;   // cintura invisible (solo en la parte superior); la crea corpse_spawn
 
 drives_angle = true;   // el ángulo lo decide la pareja (corpse_pair_update), no el giro del padre
 air_friction_mult = CORPSE_AIR_FRICTION_MULT;

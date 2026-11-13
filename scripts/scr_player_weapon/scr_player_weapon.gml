@@ -31,6 +31,32 @@ function player_grab_item() {
 ///       hacia adelante; quieto, la lanza suavemente.
 /// @param {Struct} _in Input del frame actual.
 function player_release_item(_in) {
+    if (crouching || sliding) {
+        // Agachado o deslizando, el arma cae de la mano: sin impulso ni giro.
+        // DECISIÓN: va antes que "arriba" para que agachado nunca la lance.
+        player_drop_item(0, 0, 0);
+    } else if (_in.up_held && abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
+        // Mirando arriba EN MOVIMIENTO: en diagonal (45°) hacia donde corre.
+        var _dir = (hsp > 0) ? 45 : 135;
+        player_drop_item(lengthdir_x(HOLDABLE_THROW_DIAG_SPEED, _dir),
+                         lengthdir_y(HOLDABLE_THROW_DIAG_SPEED, _dir), -HOLDABLE_THROW_SPIN * sign(hsp));
+    } else if (_in.up_held) {
+        // Mirando arriba QUIETO: recto hacia arriba, sin velocidad horizontal (biblia 4.4.4).
+        player_drop_item(0, -HOLDABLE_THROW_UP_SPEED, -HOLDABLE_THROW_SPIN * facing);
+    } else if (abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
+        // CAMBIO: velocidad ABSOLUTA, ya no se le suma hsp. Con la gravedad nueva volaría demasiado lejos.
+        player_drop_item(sign(hsp) * HOLDABLE_THROW_SPEED, HOLDABLE_THROW_LIFT, -HOLDABLE_THROW_SPIN * sign(hsp));
+    } else {
+        player_drop_item(facing * HOLDABLE_DROP_SPEED, HOLDABLE_DROP_LIFT, -HOLDABLE_DROP_SPIN * facing);
+    }
+}
+
+/// @desc ÚNICO lugar donde el jugador deja de sostener algo: lo suelta desde la mano con la
+///       velocidad indicada. Lo usan lanzar (player_release_item), morir y el ragdoll.
+///       No hace nada si tiene las manos vacías.
+function player_drop_item(_hsp, _vsp, _spin) {
+    if (held_item == noone) return;
+
     // DECISIÓN: el ángulo y la mano se leen ANTES de soltar. Sin arma,
     // player_get_arm_angle() devuelve el brazo colgando (270) y el arma
     // "saltaría" de lugar en el instante de soltarla.
@@ -40,33 +66,19 @@ function player_release_item(_in) {
 
     var _w = held_item;
     held_item = noone;
-
-    if (crouching || sliding) {
-        // Agachado o deslizando, el arma cae de la mano: sin impulso ni giro.
-        // DECISIÓN: va antes que "arriba" para que agachado nunca la lance.
-        holdable_eject(_w, _hx, _hy, facing, 0, 0, 0);
-    } else if (_in.up_held && abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
-        // Mirando arriba EN MOVIMIENTO: en diagonal (45°) hacia donde corre.
-        var _dir = (hsp > 0) ? 45 : 135;
-        holdable_eject(_w, _hx, _hy, facing, lengthdir_x(HOLDABLE_THROW_DIAG_SPEED, _dir),
-                     lengthdir_y(HOLDABLE_THROW_DIAG_SPEED, _dir), -HOLDABLE_THROW_SPIN * sign(hsp));
-    } else if (_in.up_held) {
-        // Mirando arriba QUIETO: recto hacia arriba, sin velocidad horizontal (biblia 4.4.4).
-        holdable_eject(_w, _hx, _hy, facing, 0, -HOLDABLE_THROW_UP_SPEED, -HOLDABLE_THROW_SPIN * facing);
-    } else if (abs(hsp) > HOLDABLE_THROW_MIN_SPEED) {
-        // CAMBIO: velocidad ABSOLUTA, ya no se le suma hsp. Con la gravedad nueva volaría demasiado lejos.
-        holdable_eject(_w, _hx, _hy, facing, sign(hsp) * HOLDABLE_THROW_SPEED,
-                     HOLDABLE_THROW_LIFT, -HOLDABLE_THROW_SPIN * sign(hsp));
-    } else {
-        holdable_eject(_w, _hx, _hy, facing, facing * HOLDABLE_DROP_SPEED,
-                     HOLDABLE_DROP_LIFT, -HOLDABLE_DROP_SPIN * facing);
-    }
+    holdable_eject(_w, _hx, _hy, facing, _hsp, _vsp, _spin);
 }
 
 /// @desc Intenta disparar el arma sostenida. Aplica el retroceso al jugador.
 /// @param {Struct} _in Input del frame.
 function player_try_fire(_in) {
     if (held_item == noone) return;
+
+    // El botón de disparar, con algo equipable en la mano (gorro, casco...), se lo pone.
+    if (held_item.equip_slot != EQUIP_NONE) {
+        if (_in.fire_pressed) player_equip_held();
+        return;
+    }
 	if (!held_item.fires) return;   // solo las armas disparan
 
     // Automática: alcanza con mantener el botón. Semiautomática: un clic por disparo.

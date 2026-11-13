@@ -209,18 +209,34 @@ function fx_fur(_x, _y, _dir, _spread, _color_index, _count) {
     }
 }
 
-/// @desc Astillas de madera: restos con física de casquillo (rebotan y se quedan en el piso).
+/// @desc Astillas de madera (cajas). Ver fx_shards.
+function fx_splinters(_x, _y, _dir, _spread, _count) {
+    fx_shards(_x, _y, _dir, _spread, _count, FX_WOOD_COL_LIGHT, FX_WOOD_COL_DARK);
+}
+
+/// @desc Pedazos de algo que se rompe (astillas, trozos de casco o de chaleco): restos con física
+///       de casquillo (rebotan y se quedan en el piso), de dos colores al azar.
 /// @param {Real} _dir Hacia dónde salen (la dirección de la bala).
 /// @param {Real} _spread ± grados del abanico (180 = en todas direcciones).
-function fx_splinters(_x, _y, _dir, _spread, _count) {
+function fx_shards(_x, _y, _dir, _spread, _count, _col_a, _col_b) {
     repeat (_count) {
         var _a = _dir + random_range(-_spread, _spread);
         var _s = random_range(FX_SPLINTER_SPEED_MIN, FX_SPLINTER_SPEED_MAX);
         var _d = fx_debris_make(_x, _y, lengthdir_x(_s, _a), lengthdir_y(_s, _a) - FX_SPLINTER_LIFT,
-                                irandom_range(2, 4), 1, choose(FX_WOOD_COL_LIGHT, FX_WOOD_COL_DARK));
+                                irandom_range(2, 4), 1, choose(_col_a, _col_b));
         _d.life = FX_SPLINTER_LIFE;
         fx_debris_add(_d);
     }
+}
+
+/// @desc Un equipo puesto detuvo una bala y se rompió: chispas del impacto, pedazos de sus
+///       colores hacia donde iba la bala, y humo.
+/// @param {Struct} _spec Ficha del equipo (ver scr_equipment): trae sus colores de rotura.
+function fx_armor_break(_x, _y, _dir, _spec) {
+    fx_bullet_sparks(_x, _y, _dir);   // rebotan hacia quien disparó
+    fx_shards(_x, _y, _dir, FX_ARMOR_SHARD_SPREAD, FX_ARMOR_SHARD_COUNT, _spec.break_cols[0], _spec.break_cols[1]);
+    fx_smoke_puff(_x, _y);
+    audio_play_sfx(snd_bullet_wall, 0.1, SFX_PRIORITY_HIGH);   // PLACEHOLDER: snd_armor_break
 }
 
 /// @desc Físicas de todos los restos. Llamar desde el Step de obj_fx_shells.

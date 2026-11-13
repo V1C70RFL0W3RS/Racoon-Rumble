@@ -22,6 +22,8 @@ function holdable_draw(_h, _x, _y, _xscale, _yscale, _angle) {
     if (_tinted) palette_apply(_h.color_index);
     draw_sprite_ext(_h.sprite_index, _h.image_index, _x, _y, _xscale, _yscale, _angle, c_white, _h.image_alpha);
     if (_tinted) palette_reset();
+    // Cuerpo de un ragdoll: encima, lo que su dueño lleva puesto (chaleco...). Suelto o en una mano.
+    if (_h.body_of != noone) corpse_draw_worn(_h, _x, _y, _xscale, _angle);
 }
 
 /// @desc Dibuja un holdable sostenido: su punto de sujeción cae en la mano.
@@ -83,16 +85,24 @@ function holdable_held_y(_h, _hand_y, _facing, _angle) {
     return _hand_y - (-_h.grip_x * dsin(_angle) + _h.grip_y * _facing * dcos(_angle));
 }
 
-/// @desc Si un holdable está incrustado en el mapa, lo saca por el lado donde menos tiene que
-///       moverse (arriba, derecha o izquierda). move_and_collide NO libera a un objeto ya
-///       incrustado: solo frena los movimientos nuevos.
+/// @desc Si un holdable está incrustado en el mapa, lo saca por el lado más corto.
 function holdable_depenetrate(_h) {
-    with (_h) {
+    instance_depenetrate(_h, HOLDABLE_MAX_PUSHOUT);
+}
+
+/// @desc Si una instancia está incrustada en el mapa, la saca por el lado donde menos tiene que
+///       moverse (arriba, derecha o izquierda). move_and_collide NO libera a un objeto ya
+///       incrustado: solo frena los movimientos nuevos. Sirve para cualquier instancia con
+///       variable `tilemap` (holdables, y el jugador al levantarse del ragdoll).
+/// @param {Id.Instance} _inst
+/// @param {Real} _max Máximo de px que se busca.
+function instance_depenetrate(_inst, _max) {
+    with (_inst) {
         if (!place_meeting(x, y, tilemap)) return;
 
         var _x0 = x;
         var _y0 = y;
-        for (var _d = 1; _d <= HOLDABLE_MAX_PUSHOUT; _d++) {
+        for (var _d = 1; _d <= _max; _d++) {
             // Se prueba cada distancia en los tres sentidos antes de pasar a la siguiente:
             // gana el desplazamiento MÁS CORTO, sea cual sea su dirección.
             if (!place_meeting(_x0, _y0 - _d, tilemap)) { y = _y0 - _d; return; }
@@ -134,6 +144,22 @@ function holdable_damage(_h, _damage, _dir) {
         var _n = sprite_get_number(sprite_index);
         if (_n > 1) image_index = min(_n - 1, floor((1 - hp / max_hp) * _n));
     }
+}
+
+/// @desc Un holdable destructible (hp >= 0, p. ej. una caja) que choca contra el piso cayendo sobre
+///       pinchos se daña según la velocidad: desde lo alto se rompe; soltado desde la mano (cae
+///       despacio) no le pasa nada. Ejecutar como el holdable, el frame en que toca el piso.
+/// @param {Real} _fall Velocidad vertical con que bajaba al tocar el piso.
+/// @returns {Bool} true = se rompió (la instancia ya no sirve).
+function holdable_try_spikes(_fall) {
+    if (hp < 0 || _fall < SPIKE_BREAK_MIN_SPEED) return false;
+    if (!place_meeting(x, y, obj_spikes)) return false;
+
+    // 1 de daño a la velocidad mínima, +1 por cada SPIKE_SPEED_PER_DAMAGE más rápido.
+    var _dmg = 1 + floor((_fall - SPIKE_BREAK_MIN_SPEED) / SPIKE_SPEED_PER_DAMAGE);
+    fx_holdable_hit(id, 90);                 // astillas hacia arriba
+    holdable_damage(id, _dmg, 90);
+    return !instance_exists(id) || hp <= 0;
 }
 
 /// @desc Rompe un holdable: efecto de rotura según hit_fx y lo destruye.
@@ -202,10 +228,18 @@ function holdable_try_crush(_fall, _b0) {
     var _h = id;
     var _crushed = false;
     with (obj_player) {
-        if (state == PLAYER_STATE.DEAD) continue;
+        if (!player_is_upright()) continue;            // muerto, o en ragdoll (se prueba su cuerpo abajo)
         if (_b0 > bbox_top) continue;                   // ya estaba a la altura del cuerpo: no es la cabeza
         if (!place_meeting(x, y, _h)) continue;
-        player_take_hit(id, PLAYER_MAX_HP, 270, _fall);   // el cadáver sale hacia abajo
+        player_take_hit(id, PLAYER_MAX_HP, 270, _fall, HIT_ZONE.TOP);   // el cadáver sale hacia abajo; un casco lo salva
+        _crushed = true;
+    }
+    // Cuerpos de jugadores en ragdoll: tirados en el piso, también se los aplasta.
+    with (obj_holdable) {
+        if (body_of == noone || holder != noone || id == _h) continue;
+        if (_b0 > bbox_top) continue;
+        if (!place_meeting(x, y, _h)) continue;
+        player_take_hit(body_of, PLAYER_MAX_HP, 270, _fall, HIT_ZONE.BODY);
         _crushed = true;
     }
     // Rebota en la cabeza: un saltito hacia arriba (sigue cayendo después con la gravedad).

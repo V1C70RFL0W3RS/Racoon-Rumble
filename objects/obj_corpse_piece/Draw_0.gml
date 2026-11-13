@@ -2,18 +2,20 @@
 if (holder != noone) exit;
 
 // Salvaguarda visual (biblia 4.4.5 C: la pieza nunca se pinta a más de 8 px de la
-// articulación). Si en un golpe fuerte la varilla se estira, se dibuja recortada. Se recorta
-// la pieza que cuelga de una mano o, si ambas están sueltas, la inferior (solo una, para
-// que no se muevan las dos hacia la otra).
+// articulación). Si en un golpe fuerte la varilla se estira, la pieza se dibuja recortada
+// hacia la cintura, que vive en la parte superior (rig).
 var _px = x;
 var _py = y;
-if (partner != noone && instance_exists(partner) && (partner.holder != noone || piece_frame == 1)) {
-    var _max = corpse_rest_length() + CORPSE_DRAW_SLACK;
-    var _d = point_distance(partner.x, partner.y, x, y);
+var _top = (piece_frame == 1) ? partner : id;
+if (_top != noone && instance_exists(_top) && is_struct(_top.rig)) {
+    var _jx  = _top.rig.jx;
+    var _jy  = _top.rig.jy;
+    var _max = corpse_rod_length(piece_frame) + CORPSE_DRAW_SLACK;
+    var _d   = point_distance(_jx, _jy, x, y);
     if (_d > _max) {
         var _k = _max / _d;
-        _px = partner.x + (x - partner.x) * _k;
-        _py = partner.y + (y - partner.y) * _k;
+        _px = _jx + (x - _jx) * _k;
+        _py = _jy + (y - _jy) * _k;
     }
 }
 holdable_draw(id, _px, _py, image_xscale, image_yscale, angle);
